@@ -3,231 +3,167 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mercadinho & Quiz Interativo - Escola Digital</title>
-
-    <!-- 1. Estilização Rápida com Tailwind CSS -->
+    <title>Robô da Lógica - Aprenda Brincando!</title>
+    <!-- Favicon inline para evitar erro 404 no console -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎮</text></svg>">
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-
-    <!-- 2. Fonte Lúdica Fredoka (Google Fonts) -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
-
-    <!-- 3. Vinculação do Arquivo de Estilos Personalizado CSS -->
-    <link rel="stylesheet" href="style.css">
+    <style>
+        .btn-bounce:active { transform: scale(0.95); }
+        .card-selected { border-color: #10b981 !important; background-color: #ecfdf5 !important; }
+    </style>
 </head>
-<body class="min-h-screen text-slate-800 flex flex-col justify-between pb-8">
+<body class="bg-slate-100 font-sans min-h-screen text-slate-800 relative pb-10">
 
-    <!-- ================================================================= -->
-    <!-- TELA 1: CADASTRO DO ALUNO (OBRIGATÓRIO PARA INICIAR A AVALIAÇÃO) -->
-    <!-- ================================================================= -->
-    <div id="tela-cadastro" class="fixed inset-0 bg-emerald-600 z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-3xl p-6 sm:p-8 max-w-lg w-full shadow-2xl border-4 border-amber-300 text-center space-y-6">
-            <div class="text-6xl animate-bounce">🎓</div>
-            <h1 class="text-3xl font-bold text-emerald-950">Cadastro do Estudante</h1>
-            <p class="text-slate-600 text-sm sm:text-base">Preencha seus dados para começar a atividade!</p>
+    <!-- Canvas para efeito visual de confeti -->
+    <canvas id="confetti-canvas" class="fixed top-0 left-0 w-full h-full pointer-events-none z-50"></canvas>
 
-            <form id="form-cadastro" onsubmit="salvarCadastro(event)" class="space-y-4 text-left">
+    <!-- Modal de Cadastro do Aluno -->
+    <div id="tela-cadastro" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-40 flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl border-4 border-emerald-400">
+            <div class="text-center mb-6">
+                <span class="text-6xl animate-bounce inline-block">🤖</span>
+                <h1 class="text-2xl font-black text-emerald-950 mt-2">Robô da Lógica</h1>
+                <p class="text-slate-600 font-bold text-sm">Digite seus dados para começar a brincar!</p>
+            </div>
+
+            <form onsubmit="salvarCadastro(event)" class="space-y-4">
                 <div>
-                    <label class="block font-bold text-slate-700 mb-1">Nome Completo:</label>
-                    <input type="text" id="cad-nome" required placeholder="Digite seu nome..." 
-                           class="w-full px-4 py-3 rounded-2xl border-2 border-slate-300 focus:border-emerald-500 focus:outline-none text-lg">
+                    <label class="block font-bold text-slate-700 mb-1">Seu Nome:</label>
+                    <input type="text" id="cad-nome" placeholder="Ex: Maria" required
+                           class="w-full p-3 border-2 border-slate-300 rounded-2xl font-bold text-slate-800 focus:outline-none focus:border-emerald-500 text-lg">
                 </div>
 
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block font-bold text-slate-700 mb-1">Nº de Chamada:</label>
-                        <input type="number" id="cad-numero" required min="1" max="50" placeholder="Ex: 12" 
-                               class="w-full px-4 py-3 rounded-2xl border-2 border-slate-300 focus:border-emerald-500 focus:outline-none text-lg">
-                    </div>
-                    <div>
-                        <label class="block font-bold text-slate-700 mb-1">Turma:</label>
-                        <select id="cad-turma" required class="w-full px-4 py-3 rounded-2xl border-2 border-slate-300 focus:border-emerald-500 focus:outline-none text-lg bg-white">
-                            <option value="">Selecione...</option>
-                            <option value="8º Ano A">8º Ano A</option>
-                            <option value="8º Ano B">8º Ano B</option>
-                            <option value="1ª Série A (EM)">1ª Série A (EM)</option>
-                            <option value="1ª Série B (EM)">1ª Série B (EM)</option>
-                        </select>
-                    </div>
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">Seu Número:</label>
+                    <input type="number" id="cad-numero" placeholder="Ex: 12" required
+                           class="w-full p-3 border-2 border-slate-300 rounded-2xl font-bold text-slate-800 focus:outline-none focus:border-emerald-500 text-lg">
                 </div>
 
-                <!-- Botão de Narração em Áudio para Alunos não Alfabetizados -->
-                <button type="button" onclick="falarTexto('Digite seu nome, seu número de chamada e escolha sua turma. Depois clique no botão verde para começar!')"
-                        class="w-full bg-amber-100 hover:bg-amber-200 text-amber-900 border-2 border-amber-300 py-2.5 rounded-2xl font-bold flex items-center justify-center gap-2 btn-bounce">
-                    🔊 Ouvir Instrução de Preenchimento
-                </button>
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">Sua Turma:</label>
+                    <input type="text" id="cad-turma" placeholder="Ex: 1º Ano A, Infantil 5..." required
+                           class="w-full p-3 border-2 border-slate-300 rounded-2xl font-bold text-slate-800 focus:outline-none focus:border-emerald-500 text-lg">
+                </div>
 
-                <button type="submit" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-2xl py-4 rounded-2xl shadow-lg btn-bounce">
-                    🚀 ENTRAR NO JOGO
+                <button type="submit" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-extrabold py-4 rounded-2xl text-xl btn-bounce shadow-lg mt-4 transition">
+                    🎮 Entrar no Jogo!
                 </button>
             </form>
         </div>
     </div>
 
-    <!-- ================================================================= -->
-    <!-- CABEÇALHO FIXO COM IDENTIFICAÇÃO DO ALUNO -->
-    <!-- ================================================================= -->
-    <header class="bg-amber-300 border-b-4 border-amber-400 p-4 shadow-md sticky top-0 z-30">
-        <div class="max-w-5xl mx-auto flex flex-wrap justify-between items-center gap-3">
+    <!-- Cabeçalho Principal -->
+    <header class="bg-white border-b-4 border-slate-200 sticky top-0 z-20 shadow-sm">
+        <div class="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
             <div class="flex items-center gap-3">
-                <button onclick="falarTexto('Bem-vindo ao Jogo Educativo! Escolha o Mercadinho ou o Quiz para começar.')" class="bg-amber-500 text-white p-3 rounded-2xl shadow-md btn-bounce text-2xl">
-                    🔊
-                </button>
+                <span class="text-4xl">🤖</span>
                 <div>
-                    <h1 class="text-xl sm:text-2xl font-bold text-amber-950">🎮 Escola Digital - Consolata</h1>
-                    <p id="identificacao-aluno" class="text-xs sm:text-sm font-bold text-amber-900">Aluno: Não identificado</p>
+                    <h1 class="font-black text-xl text-slate-800">Robô da Lógica</h1>
+                    <p id="identificacao-aluno" class="text-xs font-bold text-emerald-600">Aguardando cadastro...</p>
                 </div>
             </div>
 
-            <!-- Botão de Acesso ao Painel de Notas (Professor) -->
-            <button onclick="abrirPainelProfessor()" class="bg-amber-100 hover:bg-amber-200 text-amber-900 border-2 border-amber-400 px-3 py-2 rounded-xl text-xs sm:text-sm font-bold btn-bounce">
-                📊 Ver Notas da Turma
-            </button>
+            <!-- Botões de Navegação -->
+            <div class="flex gap-2">
+                <button id="aba-mercadinho" onclick="trocarAba('mercadinho')" 
+                        class="py-2.5 px-3 rounded-2xl font-bold text-sm sm:text-base flex items-center gap-1.5 btn-bounce bg-emerald-500 text-white shadow-md">
+                    🐍 Aprenda
+                </button>
+                <button id="aba-quiz" onclick="trocarAba('quiz')" 
+                        class="py-2.5 px-3 rounded-2xl font-bold text-sm sm:text-base flex items-center gap-1.5 btn-bounce bg-white text-emerald-800 hover:bg-emerald-100">
+                    🧩 Quiz
+                </button>
+            </div>
         </div>
     </header>
 
-    <!-- NAVEGAÇÃO ENTRE ABAS -->
-    <nav class="max-w-4xl mx-auto w-full px-4 mt-6">
-        <div class="grid grid-cols-2 gap-4 bg-emerald-100 p-2 rounded-3xl border-2 border-emerald-300">
-            <button id="aba-mercadinho" onclick="trocarAba('mercadinho')" class="py-3 px-4 rounded-2xl font-bold text-lg sm:text-xl flex items-center justify-center gap-2 btn-bounce bg-emerald-500 text-white shadow-lg">
-                <span class="text-2xl">🛒</span> Mercadinho
-            </button>
-            <button id="aba-quiz" onclick="trocarAba('quiz')" class="py-3 px-4 rounded-2xl font-bold text-lg sm:text-xl flex items-center justify-center gap-2 btn-bounce bg-white text-emerald-800 hover:bg-emerald-200">
-                <span class="text-2xl">❓</span> Quiz de Lógica (10 pts)
-            </button>
-        </div>
-    </nav>
+    <!-- Conteúdo Principal -->
+    <main class="max-w-4xl mx-auto px-4 mt-6">
 
-    <!-- CONTEÚDO PRINCIPAL (MERCADINHO E QUIZ) -->
-    <main class="max-w-5xl mx-auto w-full px-4 mt-6 flex-grow">
-
-        <!-- ATIVIDADE 1: MERCADINHO -->
-        <section id="sec-mercadinho" class="space-y-6">
-            <div class="bg-white p-6 rounded-3xl shadow-xl border-4 border-emerald-200">
-                <div class="flex items-center justify-between mb-6 bg-emerald-50 p-4 rounded-2xl border border-emerald-200">
-                    <div class="flex items-center gap-3">
-                        <span class="text-3xl">🛍️</span>
-                        <h2 class="text-xl sm:text-2xl font-bold text-emerald-950">Lista de Compras & Calculadora</h2>
+        <!-- ABA 1: PREPARATÓRIO ILUSTRADO POR NÍVEIS -->
+        <section id="sec-mercadinho" class="block">
+            <div class="bg-gradient-to-r from-emerald-500 to-teal-600 rounded-3xl p-6 shadow-xl mb-6 text-white text-center">
+                <div class="text-6xl mb-2 animate-bounce">🤖🎮</div>
+                <h2 class="text-3xl font-extrabold mb-1">Aprenda com o Robô!</h2>
+                <p class="text-lg font-bold text-emerald-100 mb-4">Escolha um nível e complete os desafios para ganhar estrelas!</p>
+                
+                <!-- Barra de Progresso e Estrelas -->
+                <div class="bg-white/20 backdrop-blur-md rounded-2xl p-3 max-w-md mx-auto flex items-center justify-between gap-3 border border-white/40">
+                    <span id="txt-estrelas" class="font-black text-yellow-300 text-lg">⭐ 0 / 5 Concluídos</span>
+                    <div class="w-full bg-black/30 rounded-full h-4 overflow-hidden p-0.5">
+                        <div id="barra-progresso" class="bg-yellow-400 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
                     </div>
-                    <button onclick="falarTexto('Escolha os produtos, ajuste a quantidade nos botões de mais e menos, e escolha como vai pagar!')" class="bg-emerald-500 text-white p-3 rounded-2xl text-lg font-bold btn-bounce">
-                        🔊 Instrução
-                    </button>
-                </div>
-
-                <div class="mb-8">
-                    <h3 class="text-lg font-bold text-emerald-800 mb-4">1. Escolha os itens e as quantidades:</h3>
-                    <div id="grid-produtos" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
-                </div>
-
-                <div class="mb-8">
-                    <h3 class="text-lg font-bold text-emerald-800 mb-4">2. Forma de Pagamento:</h3>
-                    <div class="grid grid-cols-3 gap-3">
-                        <button onclick="selecionarPagamento('Pix')" id="pay-Pix" class="btn-pagamento bg-slate-50 border-4 border-slate-200 rounded-2xl p-3 flex flex-col items-center btn-bounce">
-                            <span class="text-3xl">📱</span><span class="font-bold text-emerald-950">Pix</span>
-                        </button>
-                        <button onclick="selecionarPagamento('Cartão')" id="pay-Cartão" class="btn-pagamento bg-slate-50 border-4 border-slate-200 rounded-2xl p-3 flex flex-col items-center btn-bounce">
-                            <span class="text-3xl">💳</span><span class="font-bold text-emerald-950">Cartão</span>
-                        </button>
-                        <button onclick="selecionarPagamento('Dinheiro')" id="pay-Dinheiro" class="btn-pagamento bg-slate-50 border-4 border-slate-200 rounded-2xl p-3 flex flex-col items-center btn-bounce">
-                            <span class="text-3xl">💵</span><span class="font-bold text-emerald-950">Dinheiro</span>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Painel de Moedas Visuais 🪙 (1 moeda por R$ 1,00) -->
-                <div class="bg-amber-50 rounded-3xl p-6 border-4 border-amber-300 space-y-4">
-                    <div class="flex justify-between items-center">
-                        <span class="text-xl font-bold text-amber-950">Moedas Totais da Compra:</span>
-                        <button onclick="ouvirResumoCompra()" class="bg-amber-500 text-white px-4 py-2 rounded-xl font-bold btn-bounce">🔊 Ouvir Resumo</button>
-                    </div>
-                    <div id="container-moedas" class="flex flex-wrap justify-center items-center gap-2 min-h-[60px] p-3 bg-amber-100/80 rounded-2xl border-2 border-amber-300"></div>
-                    <div id="resumo-compra-texto" class="text-center text-xl font-bold text-emerald-900">Nenhum item selecionado.</div>
-                    <button onclick="finalizarCompra()" class="w-full bg-emerald-500 text-white font-bold text-2xl py-4 rounded-2xl shadow-lg btn-bounce audio-pulse">
-                        ✅ FINALIZAR E OUVIR COMPRA
-                    </button>
                 </div>
             </div>
+
+            <!-- Filtro de Níveis -->
+            <div class="flex flex-wrap items-center justify-center gap-2 mb-6">
+                <button onclick="filtrarNivel(0)" id="btn-lvl-0" class="px-4 py-2 rounded-2xl font-bold text-sm bg-slate-800 text-white shadow-md btn-bounce">
+                    🌟 Todos
+                </button>
+                <button onclick="filtrarNivel(1)" id="btn-lvl-1" class="px-4 py-2 rounded-2xl font-bold text-sm bg-white text-slate-700 hover:bg-emerald-100 shadow-sm btn-bounce">
+                    🐣 Nível 1: Entrar e Mostrar
+                </button>
+                <button onclick="filtrarNivel(2)" id="btn-lvl-2" class="px-4 py-2 rounded-2xl font-bold text-sm bg-white text-slate-700 hover:bg-emerald-100 shadow-sm btn-bounce">
+                    🚦 Nível 2: Escolhas
+                </button>
+                <button onclick="filtrarNivel(3)" id="btn-lvl-3" class="px-4 py-2 rounded-2xl font-bold text-sm bg-white text-slate-700 hover:bg-emerald-100 shadow-sm btn-bounce">
+                    🚀 Nível 3: Baú e Repetição
+                </button>
+            </div>
+
+            <!-- Grid de Desafios -->
+            <div id="grid-produtos" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
         </section>
 
-        <!-- ATIVIDADE 2: QUIZ DE LÓGICA DE PROGRAMAÇÃO (10 QUESTÕES) -->
-        <section id="sec-quiz" class="space-y-6 hidden">
-            <div class="bg-white p-6 rounded-3xl shadow-xl border-4 border-sky-200">
-                <div class="flex flex-wrap justify-between items-center gap-3 mb-6 bg-sky-50 p-4 rounded-2xl border border-sky-200">
-                    <div>
-                        <span id="quiz-numero-questao" class="font-bold text-sky-900 text-lg">Questão 1 de 10</span>
-                        <span class="text-xs bg-sky-200 text-sky-900 px-2.5 py-1 rounded-full font-bold ml-2">Valor: 1,0 Ponto</span>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <button onclick="darDicaPerguntaAtual()" class="bg-amber-400 text-amber-950 px-3 py-2 rounded-xl font-bold btn-bounce text-sm">💡 Dica Mágica</button>
-                        <button onclick="ouvirPerguntaAtual()" class="bg-sky-500 text-white px-3 py-2 rounded-xl font-bold btn-bounce text-sm">🔊 Ouvir Pergunta</button>
-                    </div>
+        <!-- ABA 2: QUIZ DE LÓGICA -->
+        <section id="sec-quiz" class="hidden">
+            <div id="quiz-introducao-box"></div>
+
+            <div class="bg-white border-4 border-sky-300 rounded-3xl p-6 shadow-xl">
+                <div class="flex items-center justify-between border-b-2 border-slate-100 pb-4 mb-4">
+                    <span id="quiz-numero-questao" class="font-extrabold text-sky-700 text-lg">Pergunta 1 de 10</span>
+                    <span id="quiz-pergunta-icone" class="text-4xl">❓</span>
                 </div>
 
-                <div class="text-center py-4 px-4 bg-sky-50/50 rounded-3xl border-2 border-sky-100 mb-6">
-                    <div id="quiz-pergunta-icone" class="text-6xl mb-2">❓</div>
-                    <h2 id="quiz-pergunta-texto" class="text-xl sm:text-2xl font-bold text-sky-950">Carregando...</h2>
-                </div>
+                <h3 id="quiz-pergunta-texto" class="text-xl sm:text-2xl font-extrabold text-slate-800 mb-6 leading-relaxed">
+                    Carregando pergunta...
+                </h3>
 
+                <!-- Grid de Opções -->
                 <div id="quiz-opcoes-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
-                <div id="quiz-feedback" class="mt-6 p-4 rounded-2xl text-center font-bold text-xl hidden"></div>
+
+                <!-- Feedback Visual e Sonoro -->
+                <div id="quiz-feedback" class="mt-6 p-4 rounded-3xl text-center font-extrabold text-2xl hidden"></div>
             </div>
         </section>
 
     </main>
 
-    <!-- MODAL DE FINALIZAÇÃO E NOTA FINAL DA PROVA -->
-    <div id="modal-vitoria" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-white rounded-3xl p-8 max-w-md w-full text-center border-8 border-yellow-400 shadow-2xl space-y-6">
-            <div class="text-7xl">🏆</div>
-            <h2 class="text-3xl font-bold text-amber-900">PROVA CONCLUÍDA!</h2>
-            <div class="bg-amber-50 p-4 rounded-2xl border-2 border-amber-300">
-                <p id="res-aluno-nome" class="font-bold text-amber-950 text-lg"></p>
-                <p id="res-aluno-turma" class="text-slate-600 text-sm mb-3"></p>
-                <div class="text-4xl font-black text-emerald-600 my-2" id="res-nota-final">Nota: 10,0</div>
-                <p id="res-acertos-detalhe" class="text-slate-700 font-bold text-sm">Acertos: 10 de 10 questões</p>
+    <!-- Modal de Vitória -->
+    <div id="modal-vitoria" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl border-4 border-amber-400 text-center">
+            <div class="text-6xl mb-3 animate-bounce">🏆</div>
+            <h2 class="text-3xl font-black text-amber-600 mb-1">Parabéns!</h2>
+            <p class="text-slate-600 font-bold mb-4">Você concluiu o Desafio do Robô!</p>
+
+            <div class="bg-slate-50 border-2 border-slate-200 rounded-2xl p-4 text-left space-y-2 mb-6">
+                <p id="res-aluno-nome" class="font-bold text-slate-800">Estudante: -</p>
+                <p id="res-aluno-turma" class="font-bold text-slate-600">Turma: -</p>
+                <div class="border-t border-slate-200 my-2 pt-2">
+                    <p id="res-nota-final" class="text-2xl font-black text-emerald-600">Nota Final: 0.0</p>
+                    <p id="res-acertos-detalhe" class="text-xs font-bold text-slate-500">Acertos: 0 de 10 questões</p>
+                </div>
             </div>
-            <div class="space-y-3">
-                <button onclick="baixarRelatorioCSV()" class="w-full bg-emerald-500 text-white font-bold py-3 rounded-2xl shadow-md btn-bounce">📥 Baixar Relatório (CSV)</button>
-                <button onclick="reiniciarQuiz()" class="w-full bg-amber-400 text-amber-950 font-bold py-3 rounded-2xl shadow-md btn-bounce">🔄 Fazer Novamente</button>
-            </div>
+
+            <button onclick="reiniciarQuiz()" class="w-full bg-amber-400 hover:bg-amber-500 text-amber-950 font-extrabold py-3.5 px-6 rounded-2xl text-lg flex items-center justify-center gap-2 btn-bounce shadow-md">
+                🔄 Fazer Novamente
+            </button>
         </div>
     </div>
 
-    <!-- MODAL DO PAINEL DO PROFESSOR (BANCO DE DADOS LOCAL E TABELA) -->
-    <div id="modal-professor" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-white rounded-3xl p-6 sm:p-8 max-w-3xl w-full border-4 border-emerald-400 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
-            <div class="flex justify-between items-center border-b pb-3">
-                <h3 class="text-2xl font-bold text-emerald-950">📊 Painel do Professor - Relatório de Notas</h3>
-                <button onclick="fecharPainelProfessor()" class="text-2xl font-bold text-slate-500">&times;</button>
-            </div>
-
-            <div class="overflow-x-auto">
-                <table class="w-full text-left text-sm text-slate-700 border-collapse">
-                    <thead class="bg-emerald-100 text-emerald-950 font-bold">
-                        <tr>
-                            <th class="p-2 border border-emerald-200">Nº</th>
-                            <th class="p-2 border border-emerald-200">Aluno</th>
-                            <th class="p-2 border border-emerald-200">Turma</th>
-                            <th class="p-2 border border-emerald-200">Acertos</th>
-                            <th class="p-2 border border-emerald-200">Nota Final</th>
-                            <th class="p-2 border border-emerald-200">Data/Hora</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tabela-notas-body"></tbody>
-                </table>
-            </div>
-
-            <div class="flex justify-between gap-3 pt-4 border-t">
-                <button onclick="baixarRelatorioCSV()" class="bg-emerald-500 text-white font-bold px-4 py-2 rounded-xl btn-bounce">📥 Exportar CSV</button>
-                <button onclick="limparHistoricoNotas()" class="bg-rose-500 text-white font-bold px-4 py-2 rounded-xl btn-bounce">🗑️ Limpar Notas</button>
-            </div>
-        </div>
-    </div>
-
-    <canvas id="confetti-canvas" class="fixed inset-0 pointer-events-none z-50"></canvas>
-
-    <!-- 4. Vinculação do Arquivo de Lógica JavaScript -->
+    <!-- Script Principal -->
     <script src="script.js"></script>
 </body>
 </html>
