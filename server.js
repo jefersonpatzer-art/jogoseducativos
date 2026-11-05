@@ -58,3 +58,11 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`🚀 Servidor rodando e aguardando notas na porta ${PORT}`);
 });
+fetch('https://jogoseducativos-production.up.railway.app/api/salvar-nota', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(registro)
+})
+.then(response => response.json())
+.then(data => console.log('✅ Nota salva com sucesso no MySQL:', data))
+.catch(error => console.error('❌ Erro ao enviar nota:', error));
