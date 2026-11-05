@@ -4,7 +4,7 @@ const cors = require('cors');
 
 const app = express();
 
-// Permite requisições vindas do GitHub Pages sem bloqueio de CORS
+// Configuração irrestrita de CORS para comunicação com o GitHub Pages
 app.use(cors({
     origin: '*',
     methods: ['GET', 'POST', 'OPTIONS'],
@@ -13,7 +13,7 @@ app.use(cors({
 
 app.use(express.json());
 
-// Conexão com o Banco de Dados MySQL no Railway
+// Conexão com a base de dados MySQL no Railway via Pool
 const db = mysql.createPool({
     host: process.env.MYSQLHOST || 'iriguchi.proxy.rlwy.net',
     port: process.env.MYSQLPORT || 58507,
@@ -25,7 +25,7 @@ const db = mysql.createPool({
     queueLimit: 0
 });
 
-// Testar conexão ao iniciar
+// Teste inicial de conexão
 db.getConnection((err, connection) => {
     if (err) {
         console.error('❌ Erro ao conectar ao MySQL:', err.message);
@@ -35,12 +35,12 @@ db.getConnection((err, connection) => {
     }
 });
 
-// Rota padrão para teste no navegador
+// Rota de verificação do estado da API
 app.get('/', (req, res) => {
-    res.send('API do Quiz está online e pronta para receber notas!');
+    res.send('API do Quiz Robô da Lógica está online!');
 });
 
-// Rota HTTP POST para receber e gravar a nota do aluno
+// Rota POST para persistência das notas
 app.post('/api/salvar-nota', (req, res) => {
     const { nome, numero, turma, acertos, nota } = req.body;
 
@@ -52,16 +52,16 @@ app.post('/api/salvar-nota', (req, res) => {
 
     db.query(sql, [nome, numero, turma, acertos, nota], (err, result) => {
         if (err) {
-            console.error('Erro ao inserir no banco:', err);
+            console.error('❌ Erro ao inserir no banco:', err);
             return res.status(500).json({ error: 'Erro ao salvar a nota.' });
         }
 
-        console.log(`📥 Nota registrada: ${nome} (${turma}) - Nota: ${nota}`);
+        console.log(`📥 Nota registrada: ${nome} (Nº ${numero} - ${turma}) | Nota: ${nota}`);
         res.status(201).json({ message: 'Nota registrada com sucesso!', id: result.insertId });
     });
 });
 
-// Inicia o servidor na porta informada pela nuvem
+// Inicialização do servidor escutando em 0.0.0.0
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`🚀 Servidor rodando na porta ${PORT}`);
