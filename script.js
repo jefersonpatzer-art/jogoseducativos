@@ -551,22 +551,41 @@ function dispararConfeti() {
     animar();
     setTimeout(() => { cancelAnimationFrame(animId); ctx.clearRect(0,0,canvas.width,canvas.height); }, 3500);
 }
-function enviarNotaParaMySQL(registro) {
-    // Substitua pelo endereço do seu servidor de API
-    fetch('https://SUA_API_URL.com/api/salvar-nota', {
+function finalizarProvaEGravarNota() {
+    tocarSom('acerto');
+    dispararConfeti();
+
+    const notaFinal = ((quizPontuacao / CONFIG_PROFESSOR.quiz.length) * 10).toFixed(1);
+    
+    // 1. Prepara o objeto com os dados do aluno
+    const registro = {
+        nome: dadosAluno.nome || "Anônimo",
+        numero: Number(dadosAluno.numero) || 0,
+        turma: dadosAluno.turma || "Geral",
+        acertos: quizPontuacao,
+        nota: parseFloat(notaFinal)
+    };
+
+    // 2. Salva localmente no navegador (fallback)
+    let historico = JSON.parse(localStorage.getItem('historico_quiz_consolata') || '[]');
+    historico.push(registro);
+    localStorage.setItem('historico_quiz_consolata', JSON.stringify(historico));
+
+    // 3. ENVIA PARA O BACKEND NO RAILWAY -> MYSQL
+    fetch('https://jogoseducativos-production.up.railway.app/api/salvar-nota', {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            nome: registro.nome,
-            numero: registro.numero,
-            turma: registro.turma,
-            acertos: registro.acertos,
-            nota: registro.nota
-        })
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(registro)
     })
     .then(response => response.json())
-    .then(data => console.log('Sucesso ao gravar no MySQL:', data))
-    .catch(error => console.error('Erro ao enviar nota:', error));
+    .then(data => console.log('✅ Nota salva no MySQL:', data))
+    .catch(error => console.error('❌ Erro de conexão:', error));
+
+    // 4. Atualiza os dados na tela do aluno
+    document.getElementById('res-aluno-nome').innerText = `Estudante: ${registro.nome} (Nº ${registro.numero})`;
+    document.getElementById('res-aluno-turma').innerText = `Turma: ${registro.turma}`;
+    document.getElementById('res-nota-final').innerText = `Nota Final: ${notaFinal}`;
+    document.getElementById('res-acertos-detalhe').innerText = `Acertos: ${quizPontuacao} de 10 questões`;
+
+    document.getElementById('modal-vitoria').classList.remove('hidden');
 }
