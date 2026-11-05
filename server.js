@@ -1,28 +1,31 @@
-// ============================================================
-// SERVIDOR BACKEND (API REST FOR MYSQL)
-// Dependências necessárias: npm install express mysql2 cors
-// ============================================================
-
 const express = require('express');
 const mysql = require('mysql2');
 const cors = require('cors');
 
 const app = express();
-app.use(cors()); // Permite requisições vindas de qualquer link (inclusive GitHub Pages)
+
+// Permite requisições vindas do GitHub Pages sem bloqueio de CORS
+app.use(cors({
+    origin: '*',
+    methods: ['GET', 'POST', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
 app.use(express.json());
 
+// Conexão com o Banco de Dados MySQL no Railway
 const db = mysql.createPool({
     host: process.env.MYSQLHOST || 'iriguchi.proxy.rlwy.net',
-    port: process.env.MYSQLPORT || 58507, // Porta de 5 dígitos do Railway
+    port: process.env.MYSQLPORT || 58507,
     user: process.env.MYSQLUSER || 'root',
     password: process.env.MYSQLPASSWORD || 'WxTabLGohyNQooAqRlUpdcOMlSKMsAFc',
-    database: process.env.MYSQLDATABASE || 'notas_Jogos_educativos', // Ou o nome do Schema que você criou no Workbench
+    database: process.env.MYSQLDATABASE || 'railway',
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0
 });
 
-// TESTAR CONEXÃO COM O BANCO DE DADOS
+// Testar conexão ao iniciar
 db.getConnection((err, connection) => {
     if (err) {
         console.error('❌ Erro ao conectar ao MySQL:', err.message);
@@ -32,7 +35,12 @@ db.getConnection((err, connection) => {
     }
 });
 
-// ROTA HTTP POST: Recebe a nota enviada pelo jogo do aluno
+// Rota padrão para teste no navegador
+app.get('/', (req, res) => {
+    res.send('API do Quiz está online e pronta para receber notas!');
+});
+
+// Rota HTTP POST para receber e gravar a nota do aluno
 app.post('/api/salvar-nota', (req, res) => {
     const { nome, numero, turma, acertos, nota } = req.body;
 
@@ -41,28 +49,20 @@ app.post('/api/salvar-nota', (req, res) => {
     }
 
     const sql = `INSERT INTO notas_quiz (nome, numero, turma, acertos, nota) VALUES (?, ?, ?, ?, ?)`;
-    
+
     db.query(sql, [nome, numero, turma, acertos, nota], (err, result) => {
         if (err) {
             console.error('Erro ao inserir no banco:', err);
             return res.status(500).json({ error: 'Erro ao salvar a nota.' });
         }
-        
+
         console.log(`📥 Nota registrada: ${nome} (${turma}) - Nota: ${nota}`);
         res.status(201).json({ message: 'Nota registrada com sucesso!', id: result.insertId });
     });
 });
 
-// INICIAR SERVIDOR NA PORTA 3000
+// Inicia o servidor na porta informada pela nuvem
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log(`🚀 Servidor rodando e aguardando notas na porta ${PORT}`);
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`🚀 Servidor rodando na porta ${PORT}`);
 });
-fetch('https://jogoseducativos-production.up.railway.app/api/salvar-nota', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(registro)
-})
-.then(response => response.json())
-.then(data => console.log('✅ Nota salva com sucesso no MySQL:', data))
-.catch(error => console.error('❌ Erro ao enviar nota:', error));
