@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jogo Educativo Interativo - Mercadinho e Quiz</title>
-    <!-- Tailwind CSS for styling -->
+    <title>Mercadinho & Quiz Interativo - Atividade Educativa</title>
+    <!-- Tailwind CSS para estilização moderna e responsiva -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts for friendly rounded typography -->
+    <!-- Fonte divertida e legível para crianças (Fredoka) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
@@ -17,217 +17,154 @@
             user-select: none;
             -webkit-user-select: none;
         }
-        
+
+        /* Animações e efeitos interativos */
         .btn-bounce {
             transition: transform 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.15s ease;
         }
         .btn-bounce:hover {
-            transform: translateY(-4px) scale(1.03);
+            transform: translateY(-4px) scale(1.02);
         }
         .btn-bounce:active {
-            transform: translateY(2px) scale(0.97);
+            transform: translateY(2px) scale(0.98);
         }
 
-        .selected-card {
+        .card-selected {
             border-color: #22c55e !important;
-            background-color: #f0fdf4 !important;
-            box-shadow: 0 0 25px rgba(34, 197, 94, 0.4) !important;
-            transform: scale(1.05);
+            background-color: #ecfdf5 !important;
+            box-shadow: 0 0 20px rgba(34, 197, 94, 0.3) !important;
         }
 
+        /* Efeito de pulso para botões de áudio */
         @keyframes pulse-ring {
-            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
-            70% { transform: scale(1); box-shadow: 0 0 0 15px rgba(34, 197, 94, 0); }
-            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 12px rgba(16, 185, 129, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
         }
-
-        .pulse-speak {
-            animation: pulse-ring 2s infinite;
-        }
-
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar {
-            width: 10px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #f1f1f1; 
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #86efac; 
-            border-radius: 5px;
+        .audio-pulse {
+            animation: pulse-ring 2.5s infinite;
         }
     </style>
 </head>
-<body class="min-h-screen text-slate-800 flex flex-col justify-between pb-6">
+<body class="min-h-screen text-slate-800 flex flex-col justify-between pb-8">
 
-    <!-- TOP HEADER / NAV -->
-    <header class="bg-amber-300 border-b-4 border-amber-400 p-4 shadow-md sticky top-0 z-40">
+    <!-- CABEÇALHO DA APLICAÇÃO -->
+    <header class="bg-amber-300 border-b-4 border-amber-400 p-4 shadow-md sticky top-0 z-30">
         <div class="max-w-5xl mx-auto flex flex-wrap justify-between items-center gap-3">
-            
-            <!-- Title with Audio Button -->
             <div class="flex items-center gap-3">
-                <button onclick="speakText('Jogo Educativo Interativo. Escolha o Mercadinho ou o Quiz!')" 
-                        title="Ouvir Título"
-                        class="bg-amber-500 hover:bg-amber-600 text-white p-3 rounded-2xl shadow-md btn-bounce text-2xl flex items-center justify-center">
+                <button onclick="falarTexto('Bem-vindo ao Jogo Educativo! Escolha o Mercadinho ou o Quiz para começar.')" 
+                        title="Ouvir mensagem de boas-vindas"
+                        class="bg-amber-500 hover:bg-amber-600 text-white p-3 rounded-2xl shadow-md btn-bounce text-2xl">
                     🔊
                 </button>
-                <h1 class="text-2xl md:text-3xl font-bold text-amber-950 tracking-wide">
-                    🎮 Jogo Educativo
+                <h1 class="text-2xl sm:text-3xl font-bold text-amber-950 tracking-wide">
+                    🎮 Aprendendo Brincando
                 </h1>
             </div>
 
-            <!-- Level Selector (Turma A vs Turma B) -->
-            <div class="flex items-center bg-amber-100 p-1.5 rounded-2xl border-2 border-amber-400">
-                <span class="text-xs font-bold text-amber-900 mr-2 ml-1 hidden sm:inline">Nível:</span>
-                <button id="btn-lvl-1" onclick="setLevel(1)" 
-                        class="px-3 py-1.5 rounded-xl font-bold text-sm sm:text-base transition-all bg-emerald-500 text-white shadow-sm">
-                    🐣 Turma A (Nível 1)
-                </button>
-                <button id="btn-lvl-2" onclick="setLevel(2)" 
-                        class="px-3 py-1.5 rounded-xl font-bold text-sm sm:text-base transition-all text-amber-800 hover:bg-amber-200">
-                    🚀 Turma B (Nível 2)
-                </button>
-            </div>
+            <!-- Botão de Ajuda do Professor -->
+            <button onclick="abrirModalProfessor()" 
+                    class="bg-amber-100 hover:bg-amber-200 text-amber-900 border-2 border-amber-400 px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 btn-bounce">
+                <span>⚙️ Como Alterar Perguntas</span>
+            </button>
         </div>
     </header>
 
-    <!-- NAVIGATION TABS -->
-    <div class="max-w-4xl mx-auto w-full px-4 mt-6">
+    <!-- NAVEGAÇÃO PRINCIPAL (ABAS DE ATIVIDADES) -->
+    <nav class="max-w-4xl mx-auto w-full px-4 mt-6">
         <div class="grid grid-cols-2 gap-4 bg-emerald-100 p-2 rounded-3xl border-2 border-emerald-300">
-            <button id="tab-mercado" onclick="switchTab('mercado')" 
+            <button id="aba-mercadinho" onclick="trocarAba('mercadinho')" 
                     class="py-3 px-4 rounded-2xl font-bold text-lg sm:text-xl flex items-center justify-center gap-2 btn-bounce bg-emerald-500 text-white shadow-lg">
                 <span class="text-2xl">🛒</span> Mercadinho
             </button>
-            <button id="tab-quiz" onclick="switchTab('quiz')" 
+            <button id="aba-quiz" onclick="trocarAba('quiz')" 
                     class="py-3 px-4 rounded-2xl font-bold text-lg sm:text-xl flex items-center justify-center gap-2 btn-bounce bg-white text-emerald-800 hover:bg-emerald-200">
-                <span class="text-2xl">❓</span> Quiz Divertido
+                <span class="text-2xl">❓</span> Quiz da Aula
             </button>
         </div>
-    </div>
+    </nav>
 
-    <!-- MAIN CONTENT CONTAINER -->
-    <main class="max-w-4xl mx-auto w-full px-4 mt-6 flex-grow">
+    <!-- CONTEÚDO PRINCIPAL -->
+    <main class="max-w-5xl mx-auto w-full px-4 mt-6 flex-grow">
 
         <!-- ================================================================= -->
-        <!-- MÓDULO 1: CALCULADORA DE COMPRAS (MERCADINHO / FEIRINHA) -->
+        <!-- ATIVIDADE 1: MERCADINHO E CALCULADORA DE COMPRAS INTERATIVA -->
         <!-- ================================================================= -->
-        <section id="sec-mercado" class="space-y-6">
+        <section id="sec-mercadinho" class="space-y-6">
             
-            <div class="bg-white p-6 rounded-3xl shadow-xl border-4 border-emerald-200 relative">
-                <!-- Audio Guide Banner -->
-                <div class="flex items-center justify-between mb-4 bg-emerald-50 p-3 rounded-2xl border border-emerald-200">
+            <div class="bg-white p-6 rounded-3xl shadow-xl border-4 border-emerald-200">
+                
+                <!-- Guia de Instrução com Áudio -->
+                <div class="flex items-center justify-between mb-6 bg-emerald-50 p-4 rounded-2xl border border-emerald-200">
                     <div class="flex items-center gap-3">
                         <span class="text-3xl">🛍️</span>
-                        <h2 class="text-xl font-bold text-emerald-900">Monte sua Compra!</h2>
+                        <h2 class="text-xl sm:text-2xl font-bold text-emerald-950">Lista de Compras & Calculadora</h2>
                     </div>
-                    <button onclick="speakText('Bem-vindo ao Mercadinho! Escolha o produto, a quantidade e como quer pagar!')" 
-                            class="bg-emerald-500 hover:bg-emerald-600 text-white p-2.5 rounded-xl text-xl btn-bounce">
-                        🔊 Ouvir Ajuda
+                    <button onclick="falarTexto('Escolha os produtos, ajuste as quantidades nos botões de mais e menos, e escolha como vai pagar!')" 
+                            class="bg-emerald-500 hover:bg-emerald-600 text-white p-3 rounded-2xl text-xl btn-bounce">
+                        🔊 Ouvir Instruções
                     </button>
                 </div>
 
-                <!-- PASSO 1: Escolha do Produto -->
-                <div class="mb-6">
-                    <label class="block text-emerald-800 font-bold text-lg mb-3 flex items-center gap-2">
-                        <span>1. Escolha o Produto:</span>
-                        <button onclick="speakText('Passo 1: Clique no produto que deseja comprar!')" class="text-emerald-600 hover:text-emerald-800">🔊</button>
-                    </label>
-                    <div id="grid-produtos" class="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                        <!-- Item 1: Sorvete -->
-                        <button onclick="selectProduct('Sorvete', 2, '🍦')" id="prod-Sorvete" 
-                                class="prod-btn bg-slate-50 border-4 border-slate-200 rounded-3xl p-4 flex flex-col items-center btn-bounce">
-                            <span class="text-5xl sm:text-6xl mb-2">🍦</span>
-                            <span class="font-bold text-emerald-900 text-lg">Sorvete</span>
-                            <span class="bg-amber-200 text-amber-900 text-xs px-2 py-1 rounded-full font-bold mt-2">2 Moedas 🪙</span>
+                <!-- GRID DE PRODUTOS DISPONÍVEIS -->
+                <div class="mb-8">
+                    <h3 class="text-lg font-bold text-emerald-800 mb-4 flex items-center gap-2">
+                        <span>1. Adicione os itens à sua lista:</span>
+                    </h3>
+                    <div id="grid-produtos" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <!-- Itens renderizados dinamicamente pelo JS -->
+                    </div>
+                </div>
+
+                <!-- SELEÇÃO DA FORMA DE PAGAMENTO -->
+                <div class="mb-8">
+                    <h3 class="text-lg font-bold text-emerald-800 mb-4 flex items-center gap-2">
+                        <span>2. Forma de Pagamento:</span>
+                        <button onclick="falarTexto('Escolha a forma de pagamento: Pix, Cartão ou Dinheiro.')" class="text-emerald-600">🔊</button>
+                    </h3>
+                    <div class="grid grid-cols-3 gap-3">
+                        <button onclick="selecionarPagamento('Pix', '📱')" id="pay-Pix" 
+                                class="btn-pagamento bg-slate-50 border-4 border-slate-200 rounded-2xl p-3 flex flex-col sm:flex-row items-center justify-center gap-2 btn-bounce">
+                            <span class="text-3xl">📱</span>
+                            <span class="font-bold text-emerald-950">Pix</span>
                         </button>
-                        <!-- Item 2: Maçã -->
-                        <button onclick="selectProduct('Maçã', 1, '🍎')" id="prod-Maçã" 
-                                class="prod-btn bg-slate-50 border-4 border-slate-200 rounded-3xl p-4 flex flex-col items-center btn-bounce">
-                            <span class="text-5xl sm:text-6xl mb-2">🍎</span>
-                            <span class="font-bold text-emerald-900 text-lg">Maçã</span>
-                            <span class="bg-amber-200 text-amber-900 text-xs px-2 py-1 rounded-full font-bold mt-2">1 Moeda 🪙</span>
+                        <button onclick="selecionarPagamento('Cartão', '💳')" id="pay-Cartão" 
+                                class="btn-pagamento bg-slate-50 border-4 border-slate-200 rounded-2xl p-3 flex flex-col sm:flex-row items-center justify-center gap-2 btn-bounce">
+                            <span class="text-3xl">💳</span>
+                            <span class="font-bold text-emerald-950">Cartão</span>
                         </button>
-                        <!-- Item 3: Suco -->
-                        <button onclick="selectProduct('Suco', 3, '🧃')" id="prod-Suco" 
-                                class="prod-btn bg-slate-50 border-4 border-slate-200 rounded-3xl p-4 flex flex-col items-center btn-bounce">
-                            <span class="text-5xl sm:text-6xl mb-2">🧃</span>
-                            <span class="font-bold text-emerald-900 text-lg">Suco</span>
-                            <span class="bg-amber-200 text-amber-900 text-xs px-2 py-1 rounded-full font-bold mt-2">3 Moedas 🪙</span>
-                        </button>
-                        <!-- Item 4: Hambúrguer -->
-                        <button onclick="selectProduct('Hambúrguer', 4, '🍔')" id="prod-Hambúrguer" 
-                                class="prod-btn bg-slate-50 border-4 border-slate-200 rounded-3xl p-4 flex flex-col items-center btn-bounce">
-                            <span class="text-5xl sm:text-6xl mb-2">🍔</span>
-                            <span class="font-bold text-emerald-900 text-lg">Lanche</span>
-                            <span class="bg-amber-200 text-amber-900 text-xs px-2 py-1 rounded-full font-bold mt-2">4 Moedas 🪙</span>
+                        <button onclick="selecionarPagamento('Dinheiro', '💵')" id="pay-Dinheiro" 
+                                class="btn-pagamento bg-slate-50 border-4 border-slate-200 rounded-2xl p-3 flex flex-col sm:flex-row items-center justify-center gap-2 btn-bounce">
+                            <span class="text-3xl">💵</span>
+                            <span class="font-bold text-emerald-950">Dinheiro</span>
                         </button>
                     </div>
                 </div>
 
-                <!-- PASSO 2: Quantidade -->
-                <div class="mb-6">
-                    <label class="block text-emerald-800 font-bold text-lg mb-3 flex items-center gap-2">
-                        <span>2. Escolha a Quantidade:</span>
-                        <button onclick="speakText('Passo 2: Quantos você quer comprar?')" class="text-emerald-600 hover:text-emerald-800">🔊</button>
-                    </label>
-                    <div class="flex flex-wrap gap-4 justify-center sm:justify-start">
-                        <button onclick="selectQuantity(1)" id="qty-1" 
-                                class="qty-btn bg-slate-50 border-4 border-slate-200 rounded-2xl px-6 py-3 font-bold text-2xl btn-bounce text-slate-700 flex items-center gap-2">
-                            <span>1</span> <span class="text-xl">📦</span>
-                        </button>
-                        <button onclick="selectQuantity(2)" id="qty-2" 
-                                class="qty-btn bg-slate-50 border-4 border-slate-200 rounded-2xl px-6 py-3 font-bold text-2xl btn-bounce text-slate-700 flex items-center gap-2">
-                            <span>2</span> <span class="text-xl">📦📦</span>
-                        </button>
-                        <button id="qty-3-btn" onclick="selectQuantity(3)" id="qty-3" 
-                                class="qty-btn bg-slate-50 border-4 border-slate-200 rounded-2xl px-6 py-3 font-bold text-2xl btn-bounce text-slate-700 flex items-center gap-2">
-                            <span>3</span> <span class="text-xl">📦📦📦</span>
+                <!-- CAIXA DE RESUMO E MOEDAS VISUAIS -->
+                <div class="bg-amber-50 rounded-3xl p-6 border-4 border-amber-300 space-y-4">
+                    <div class="flex flex-col sm:flex-row justify-between items-center gap-3">
+                        <span class="text-xl font-bold text-amber-950">Moedas do Valor Total:</span>
+                        <button onclick="ouvirResumoCompra()" class="bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-xl font-bold flex items-center gap-2 btn-bounce">
+                            🔊 Ouvir Resumo
                         </button>
                     </div>
-                </div>
 
-                <!-- PASSO 3: Forma de Pagamento -->
-                <div class="mb-6">
-                    <label class="block text-emerald-800 font-bold text-lg mb-3 flex items-center gap-2">
-                        <span>3. Como vai Pagar?</span>
-                        <button onclick="speakText('Passo 3: Escolha se vai pagar com Pix no celular ou no Cartão!')" class="text-emerald-600 hover:text-emerald-800">🔊</button>
-                    </label>
-                    <div class="grid grid-cols-2 gap-4">
-                        <button onclick="selectPayment('Pix', '📱')" id="pay-Pix" 
-                                class="pay-btn bg-slate-50 border-4 border-slate-200 rounded-3xl p-4 flex items-center justify-center gap-3 btn-bounce">
-                            <span class="text-4xl">📱</span>
-                            <span class="font-bold text-emerald-900 text-lg">Pix</span>
-                        </button>
-                        <button onclick="selectPayment('Cartão', '💳')" id="pay-Cartão" 
-                                class="pay-btn bg-slate-50 border-4 border-slate-200 rounded-3xl p-4 flex items-center justify-center gap-3 btn-bounce">
-                            <span class="text-4xl">💳</span>
-                            <span class="font-bold text-emerald-900 text-lg">Cartão</span>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- VISUALIZAÇÃO DO TOTAL E MOEDAS -->
-                <div class="bg-amber-50 rounded-3xl p-5 border-4 border-amber-300 text-center space-y-4">
-                    <div class="text-amber-900 font-bold text-lg flex items-center justify-center gap-2">
-                        <span>Total de Moedas para Pagar:</span>
-                        <button onclick="speakTotal()" class="text-amber-700 hover:text-amber-900 text-xl">🔊</button>
+                    <!-- Visualizador Dinâmico de Moedas (1 moeda = R$ 1) -->
+                    <div id="container-moedas" class="flex flex-wrap justify-center items-center gap-2 min-h-[60px] p-3 bg-amber-100/80 rounded-2xl border-2 border-amber-300">
+                        <!-- Moedas renderizadas via JS -->
                     </div>
 
-                    <!-- Representação Gráfica das Moedas -->
-                    <div id="coins-container" class="flex flex-wrap justify-center items-center gap-2 min-h-[50px] p-2 bg-amber-100 rounded-2xl border border-amber-200">
-                        <span class="text-amber-600 text-sm">Escolha os itens acima para ver as moedinhas...</span>
+                    <!-- Resumo em Texto Grande e Acessível -->
+                    <div id="resumo-compra-texto" class="text-center text-xl sm:text-2xl font-bold text-emerald-900">
+                        Nenhum item selecionado.
                     </div>
 
-                    <!-- Resumo em Texto Grande -->
-                    <div id="cart-summary-text" class="text-xl sm:text-2xl font-bold text-emerald-900">
-                        Nenhum item escolhido
-                    </div>
-
-                    <!-- Botão de Ação / Ouvir Total -->
-                    <button onclick="checkoutAndSpeak()" 
-                            class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xl py-4 rounded-2xl shadow-lg btn-bounce flex items-center justify-center gap-3 pulse-speak">
-                        <span class="text-3xl">🔊</span>
-                        <span>OUVIR TOTAL DA COMPRA</span>
+                    <!-- Botão Final de Finalizar Compra -->
+                    <button onclick="finalizarCompra()" 
+                            class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xl sm:text-2xl py-4 rounded-2xl shadow-lg btn-bounce flex items-center justify-center gap-3 audio-pulse">
+                        <span class="text-3xl">✅</span>
+                        <span>FINALIZAR E OUVIR COMPRA</span>
                     </button>
                 </div>
 
@@ -236,40 +173,40 @@
         </section>
 
         <!-- ================================================================= -->
-        <!-- MÓDULO 2: QUIZ INTERATIVO VISO-AUDITIVO -->
+        <!-- ATIVIDADE 2: QUIZ INTERATIVO VISO-AUDITIVO -->
         <!-- ================================================================= -->
         <section id="sec-quiz" class="space-y-6 hidden">
             
-            <div class="bg-white p-6 rounded-3xl shadow-xl border-4 border-sky-200 relative">
+            <div class="bg-white p-6 rounded-3xl shadow-xl border-4 border-sky-200">
                 
-                <!-- Quiz Header Scorebar -->
+                <!-- Placar de Pontos e Estrelas -->
                 <div class="flex justify-between items-center mb-6 bg-sky-50 p-4 rounded-2xl border border-sky-200">
                     <div class="flex items-center gap-2">
-                        <span class="text-2xl">⭐</span>
-                        <span class="font-bold text-sky-900 text-lg sm:text-xl">Pontos:</span>
-                        <span id="quiz-stars" class="text-2xl sm:text-3xl"></span>
+                        <span class="text-3xl">⭐</span>
+                        <span class="font-bold text-sky-950 text-xl">Pontuação:</span>
+                        <span id="quiz-placar-estrelas" class="text-2xl sm:text-3xl"></span>
                     </div>
-                    <button onclick="speakCurrentQuestion()" 
+                    <button onclick="ouvirPerguntaAtual()" 
                             class="bg-sky-500 hover:bg-sky-600 text-white px-4 py-2 rounded-xl font-bold btn-bounce flex items-center gap-2 shadow-md">
                         <span class="text-2xl">🔊</span>
                         <span class="hidden sm:inline">Ouvir Pergunta</span>
                     </button>
                 </div>
 
-                <!-- Pergunta Box -->
-                <div class="text-center py-4 px-2">
-                    <div id="quiz-question-icon" class="text-7xl mb-3 animate-bounce">❓</div>
-                    <h2 id="quiz-question-text" class="text-2xl sm:text-3xl font-bold text-sky-950">
+                <!-- Pergunta Atual -->
+                <div class="text-center py-6 px-4 bg-sky-50/50 rounded-3xl border-2 border-sky-100 mb-6">
+                    <div id="quiz-pergunta-icone" class="text-7xl mb-3">❓</div>
+                    <h2 id="quiz-pergunta-texto" class="text-2xl sm:text-3xl font-bold text-sky-950">
                         Carregando pergunta...
                     </h2>
                 </div>
 
-                <!-- Grid de Opções Visuais -->
-                <div id="quiz-options-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
-                    <!-- Gerado dinamicamente via JS -->
+                <!-- Opções de Resposta Visuais -->
+                <div id="quiz-opcoes-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <!-- Opções inseridas dinamicamente pelo JS -->
                 </div>
 
-                <!-- Feedback Visual Box -->
+                <!-- Painel de Feedback da Resposta -->
                 <div id="quiz-feedback" class="mt-6 p-4 rounded-2xl text-center font-bold text-xl hidden transition-all">
                 </div>
 
@@ -279,131 +216,135 @@
 
     </main>
 
-    <!-- CELEBRATION / VICTORY MODAL -->
-    <div id="modal-victory" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-white rounded-3xl p-8 max-w-md w-full text-center border-8 border-yellow-400 shadow-2xl space-y-6 transform animate-bounce-short">
+    <!-- MODAL DE CELEBRAÇÃO / VITÓRIA NO QUIZ -->
+    <div id="modal-vitoria" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-3xl p-8 max-w-md w-full text-center border-8 border-yellow-400 shadow-2xl space-y-6">
             <div class="text-8xl">🏆</div>
             <h2 class="text-4xl font-bold text-amber-900">PARABÉNS!</h2>
-            <p class="text-xl font-bold text-emerald-800">Você acertou tudo e ganhou todas as estrelas!</p>
-            <div id="modal-stars" class="text-5xl">⭐⭐⭐</div>
-            <button onclick="restartQuiz()" 
+            <p class="text-xl font-bold text-emerald-800">Você completou o Quiz com sucesso!</p>
+            <div id="modal-estrelas-final" class="text-5xl">⭐⭐⭐</div>
+            <button onclick="reiniciarQuiz()" 
                     class="w-full bg-yellow-400 hover:bg-yellow-500 text-amber-950 font-bold text-2xl py-4 rounded-2xl shadow-lg btn-bounce">
                 🔄 JOGAR NOVAMENTE
             </button>
         </div>
     </div>
 
-    <!-- CANVAS FOR CONFETTI EFFECT -->
+    <!-- MODAL DE INSTRUÇÕES PARA O PROFESSOR -->
+    <div id="modal-professor" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-3xl p-6 sm:p-8 max-w-2xl w-full border-4 border-emerald-400 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center border-b pb-3">
+                <h3 class="text-2xl font-bold text-emerald-950">🛠️ Como Personalizar esta Atividade</h3>
+                <button onclick="fecharModalProfessor()" class="text-2xl font-bold text-slate-500 hover:text-slate-800">&times;</button>
+            </div>
+
+            <p class="text-slate-700">Este programa foi desenvolvido para que você possa alterar facilmente as perguntas e produtos sem precisar entender códigos complexos!</p>
+            
+            <div class="bg-slate-100 p-4 rounded-xl font-mono text-xs sm:text-sm text-slate-800 space-y-2 overflow-x-auto">
+                <p class="font-bold text-emerald-700">// Abra este arquivo index.html em qualquer editor de texto (Bloco de Notas, VS Code, etc.)</p>
+                <p class="font-bold text-emerald-700">// Procure pela seção "CONFIGURAÇÕES DO PROFESSOR" no código JavaScript:</p>
+                <br>
+                <p>const CONFIG_PROFESSOR = {</p>
+                <p>&nbsp;&nbsp;produtos: [</p>
+                <p>&nbsp;&nbsp;&nbsp;&nbsp;{ id: 1, nome: "Sorvete", preco: 3, icone: "🍦" },</p>
+                <p>&nbsp;&nbsp;&nbsp;&nbsp;...</p>
+                <p>&nbsp;&nbsp;],</p>
+                <p>&nbsp;&nbsp;quiz: [</p>
+                <p>&nbsp;&nbsp;&nbsp;&nbsp;{ pergunta: "Sua Pergunta Aqui", respostaCorreta: "Opção Certa", ... }</p>
+                <p>&nbsp;&nbsp;]</p>
+                <p>};</p>
+            </div>
+
+            <div class="text-right pt-2">
+                <button onclick="fecharModalProfessor()" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold px-6 py-2 rounded-xl btn-bounce">
+                    Entendi!
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- CANVAS PARA ANIMAÇÃO DE CONFETES DE VITÓRIA -->
     <canvas id="confetti-canvas" class="fixed inset-0 pointer-events-none z-50"></canvas>
 
-    <!-- FOOTER TEACHER HELPER -->
-    <footer class="max-w-4xl mx-auto w-full px-4 mt-8">
-        <div class="bg-emerald-900 text-emerald-100 rounded-2xl p-4 text-xs sm:text-sm flex flex-col sm:flex-row justify-between items-center gap-2">
-            <div class="flex items-center gap-2">
-                <span>🏫 Modo Laboratório Escolar</span>
-                <span class="bg-emerald-800 px-2 py-0.5 rounded text-emerald-300 font-mono">Sem Necessidade de Leitura</span>
-            </div>
-            <button onclick="toggleTeacherInstructions()" class="underline hover:text-white font-bold">
-                ℹ️ Como compartilhar este jogo com os alunos?
-            </button>
-        </div>
-
-        <!-- Teacher Instructions Modal/Panel -->
-        <div id="teacher-instructions" class="mt-3 bg-white p-4 rounded-2xl border-2 border-emerald-300 text-slate-700 text-xs sm:text-sm space-y-2 hidden">
-            <h4 class="font-bold text-emerald-900 text-base">📘 Instruções para o Professor (Como Gerar o Link):</h4>
-            <ol class="list-decimal list-inside space-y-1">
-                <li>Salve este código como um arquivo chamado <code class="bg-slate-100 px-1 rounded">index.html</code> no seu computador.</li>
-                <li><strong>Para abrir nos computadores da escola sem internet:</strong> Basta dar dois cliques no arquivo <code class="bg-slate-100 px-1 rounded">index.html</code> em cada computador ou colocar numa pasta compartilhada na rede local.</li>
-                <li><strong>Para gerar um link online gratuito:</strong> 
-                    Acesse sites como <a href="https://netlify.com/drop" target="_blank" class="text-blue-600 underline">Netlify Drop</a> ou <a href="https://tiiny.host" target="_blank" class="text-blue-600 underline">Tiiny.host</a>, arraste o arquivo <code class="bg-slate-100 px-1 rounded">index.html</code> e ele gerará um link curto para os alunos entrarem!</li>
-            </ol>
-        </div>
-    </footer>
-
-    <!-- JAVASCRIPT LOGIC -->
+    <!-- JAVASCRIPT PRINCIPAL -->
     <script>
-        /* ====================================================================
-           1. ESTADO GLOBAL DA APLICAÇÃO
-           ==================================================================== */
-        let currentLevel = 1; // 1 = Turma A (Fácil), 2 = Turma B (Médio)
-        let activeTab = 'mercado';
+        /* =====================================================================
+           📌 ÁREA DE CONFIGURAÇÃO DO PROFESSOR (EDITE SEUS DADOS AQUI!)
+           ===================================================================== */
+        const CONFIG_PROFESSOR = {
+            
+            // 1. LISTA DE PRODUTOS DO MERCADINHO
+            produtos: [
+                { id: 1, nome: "Sorvete", preco: 3, icone: "🍦" },
+                { id: 2, nome: "Suco", preco: 2, icone: "🧃" },
+                { id: 3, nome: "Pão", preco: 1, icone: "🍞" },
+                { id: 4, nome: "Pipoca", preco: 4, icone: "🍿" },
+                { id: 5, nome: "Maçã", preco: 2, icone: "🍎" },
+                { id: 6, nome: "Pizza", preco: 5, icone: "🍕" }
+            ],
 
-        // Estado do Mercadinho
-        let selectedProduct = { name: 'Sorvete', unitPrice: 2, icon: '🍦' };
-        let selectedQuantity = 1;
-        let selectedPayment = { name: 'Pix', icon: '📱' };
+            // 2. BANCO DE PERGUNTAS DO QUIZ
+            quiz: [
+                {
+                    pergunta: "Qual destas frutas é vermelha e doce?",
+                    iconePergunta: "🍎",
+                    respostaCorreta: "Maçã",
+                    opcoes: [
+                        { texto: "Maçã", icone: "🍎" },
+                        { texto: "Banana", icone: "🍌" },
+                        { texto: "Limão", icone: "🍋" }
+                    ]
+                },
+                {
+                    pergunta: "Qual animal vive dentro da água?",
+                    iconePergunta: "🌊",
+                    respostaCorreta: "Peixe",
+                    opcoes: [
+                        { texto: "Peixe", icone: "🐟" },
+                        { texto: "Gato", icone: "🐱" },
+                        { texto: "Cachorro", icone: "🐶" }
+                    ]
+                },
+                {
+                    pergunta: "Qual objeto usamos para tomar suco?",
+                    iconePergunta: "🥤",
+                    respostaCorreta: "Copo",
+                    opcoes: [
+                        { texto: "Copo", icone: "🥤" },
+                        { texto: "Lápis", icon: "✏️" },
+                        { texto: "Sapato", icone: "👟" }
+                    ]
+                }
+            ]
+        };
 
-        // Estado do Quiz
-        let currentQuestionIndex = 0;
-        let quizScore = 0;
+        /* =====================================================================
+           ESTADO DA APLICAÇÃO (CÁLCULOS E NAVEGAÇÃO)
+           ===================================================================== */
+        let carrinho = {}; // Guarda as quantidades de cada produto { idProduto: quantidade }
+        let pagamentoSelecionado = 'Pix';
 
-        /* Banco de Perguntas do Quiz */
-        const quizBank = [
-            {
-                id: 1,
-                questionText: "Qual destes animais vive na água?",
-                questionIcon: "🌊",
-                correctAnswer: "Peixe",
-                optionsLevel1: [
-                    { name: "Peixe", icon: "🐟" },
-                    { name: "Cachorro", icon: "🐶" }
-                ],
-                optionsLevel2: [
-                    { name: "Peixe", icon: "🐟" },
-                    { name: "Cachorro", icon: "🐶" },
-                    { name: "Gato", icon: "🐱" }
-                ]
-            },
-            {
-                id: 2,
-                questionText: "Qual destas frutas é vermelha?",
-                questionIcon: "🍎",
-                correctAnswer: "Maçã",
-                optionsLevel1: [
-                    { name: "Maçã", icon: "🍎" },
-                    { name: "Banana", icon: "🍌" }
-                ],
-                optionsLevel2: [
-                    { name: "Maçã", icon: "🍎" },
-                    { name: "Banana", icon: "🍌" },
-                    { name: "Uva", icon: "🍇" }
-                ]
-            },
-            {
-                id: 3,
-                questionText: "Qual objeto usamos para tomar suco?",
-                questionIcon: "🥤",
-                correctAnswer: "Copo",
-                optionsLevel1: [
-                    { name: "Copo", icon: "🥤" },
-                    { name: "Lápis", icon: "✏️" }
-                ],
-                optionsLevel2: [
-                    { name: "Copo", icon: "🥤" },
-                    { name: "Lápis", icon: "✏️" },
-                    { name: "Tênis", icon: "👟" }
-                ]
-            }
-        ];
+        let quizIndiceAtual = 0;
+        let quizPontuacao = 0;
 
-        /* ====================================================================
-           2. SINTETIZADOR DE VOZ (WEB SPEECH API) & EFETOS SONOROS
-           ==================================================================== */
-        function speakText(text) {
+        /* =====================================================================
+           SINTETIZADOR DE VOZ (WEB SPEECH API) & EFEITOS DE ÁUDIO
+           ===================================================================== */
+        function falarTexto(texto) {
             if ('speechSynthesis' in window) {
-                window.speechSynthesis.cancel(); // Para fala anterior se houver
-                const utterance = new SpeechSynthesisUtterance(text);
-                utterance.lang = 'pt-BR';
-                utterance.rate = 0.9; // Velocidade levemente reduzida para facilitação
-                utterance.pitch = 1.1; // Tom amigável
-                window.speechSynthesis.speak(utterance);
+                window.speechSynthesis.cancel(); // Cancela falas anteriores
+                const fala = new SpeechSynthesisUtterance(texto);
+                fala.lang = 'pt-BR';
+                fala.rate = 0.9;  // Velocidade suave para crianças
+                fala.pitch = 1.1; // Tom amigável
+                window.speechSynthesis.speak(fala);
             }
         }
 
-        // Sintetizador Web Audio API para sons de acerto/erro (sem arquivos externos)
+        // Sintetizador de sons simples usando Web Audio API (sem arquivos externos)
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-        function playSound(type) {
+        function tocarSom(tipo) {
             if (audioCtx.state === 'suspended') {
                 audioCtx.resume();
             }
@@ -412,357 +353,373 @@
             osc.connect(gain);
             gain.connect(audioCtx.destination);
 
-            if (type === 'pop') {
+            const agora = audioCtx.currentTime;
+
+            if (tipo === 'click') {
                 osc.type = 'sine';
-                osc.frequency.setValueAtTime(400, audioCtx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(800, audioCtx.currentTime + 0.1);
-                gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
-                gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.1);
-                osc.start();
-                osc.stop(audioCtx.currentTime + 0.1);
-            } else if (type === 'correct') {
-                // Som de Triunfo/Sininho
-                const now = audioCtx.currentTime;
+                osc.frequency.setValueAtTime(400, agora);
+                osc.frequency.exponentialRampToValueAtTime(700, agora + 0.08);
+                gain.gain.setValueAtTime(0.2, agora);
+                gain.gain.linearRampToValueAtTime(0, agora + 0.08);
+                osc.start(agora);
+                osc.stop(agora + 0.08);
+            } else if (tipo === 'acerto') {
                 osc.type = 'triangle';
-                osc.frequency.setValueAtTime(523.25, now); // C5
-                osc.frequency.setValueAtTime(659.25, now + 0.1); // E5
-                osc.frequency.setValueAtTime(783.99, now + 0.2); // G5
-                gain.gain.setValueAtTime(0.3, now);
-                gain.gain.linearRampToValueAtTime(0, now + 0.4);
-                osc.start(now);
-                osc.stop(now + 0.4);
-            } else if (type === 'wrong') {
-                // Som de Tente Novamente (Grave)
-                const now = audioCtx.currentTime;
+                osc.frequency.setValueAtTime(523.25, agora); // Dó
+                osc.frequency.setValueAtTime(659.25, agora + 0.1); // Mi
+                osc.frequency.setValueAtTime(783.99, agora + 0.2); // Sol
+                gain.gain.setValueAtTime(0.3, agora);
+                gain.gain.linearRampToValueAtTime(0, agora + 0.4);
+                osc.start(agora);
+                osc.stop(agora + 0.4);
+            } else if (tipo === 'erro') {
                 osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(220, now); // A3
-                osc.frequency.setValueAtTime(180, now + 0.15);
-                gain.gain.setValueAtTime(0.3, now);
-                gain.gain.linearRampToValueAtTime(0, now + 0.3);
-                osc.start(now);
-                osc.stop(now + 0.3);
+                osc.frequency.setValueAtTime(220, agora);
+                osc.frequency.setValueAtTime(170, agora + 0.15);
+                gain.gain.setValueAtTime(0.3, agora);
+                gain.gain.linearRampToValueAtTime(0, agora + 0.3);
+                osc.start(agora);
+                osc.stop(agora + 0.3);
             }
         }
 
-        /* ====================================================================
-           3. NÍVEIS DE DIFICULDADE (TURMA A vs TURMA B)
-           ==================================================================== */
-        function setLevel(lvl) {
-            currentLevel = lvl;
-            playSound('pop');
-
-            const btn1 = document.getElementById('btn-lvl-1');
-            const btn2 = document.getElementById('btn-lvl-2');
-            const qty3Btn = document.getElementById('qty-3-btn');
-
-            if (lvl === 1) {
-                // Turma A
-                btn1.className = "px-3 py-1.5 rounded-xl font-bold text-sm sm:text-base transition-all bg-emerald-500 text-white shadow-sm";
-                btn2.className = "px-3 py-1.5 rounded-xl font-bold text-sm sm:text-base transition-all text-amber-800 hover:bg-amber-200";
-                
-                // Ocultar opção de 3 unidades no nível 1 para simplificar
-                if (qty3Btn) qty3Btn.classList.add('hidden');
-                if (selectedQuantity > 2) selectQuantity(2);
-
-                speakText("Nível 1 ativado. Turma A!");
-            } else {
-                // Turma B
-                btn2.className = "px-3 py-1.5 rounded-xl font-bold text-sm sm:text-base transition-all bg-emerald-500 text-white shadow-sm";
-                btn1.className = "px-3 py-1.5 rounded-xl font-bold text-sm sm:text-base transition-all text-amber-800 hover:bg-amber-200";
-                
-                if (qty3Btn) qty3Btn.classList.remove('hidden');
-
-                speakText("Nível 2 ativado. Turma B!");
-            }
-
-            // Atualiza o Quiz se estiver visível
-            if (activeTab === 'quiz') {
-                renderQuizQuestion();
-            }
-        }
-
-        /* ====================================================================
-           4. TROCA DE ABAS / NAVEGAÇÃO
-           ==================================================================== */
-        function switchTab(tab) {
-            activeTab = tab;
-            playSound('pop');
-
-            const secMercado = document.getElementById('sec-mercado');
-            const secQuiz = document.getElementById('sec-quiz');
-            const tabMercado = document.getElementById('tab-mercado');
-            const tabQuiz = document.getElementById('tab-quiz');
-
-            if (tab === 'mercado') {
-                secMercado.classList.remove('hidden');
-                secQuiz.classList.add('hidden');
-
-                tabMercado.className = "py-3 px-4 rounded-2xl font-bold text-lg sm:text-xl flex items-center justify-center gap-2 btn-bounce bg-emerald-500 text-white shadow-lg";
-                tabQuiz.className = "py-3 px-4 rounded-2xl font-bold text-lg sm:text-xl flex items-center justify-center gap-2 btn-bounce bg-white text-emerald-800 hover:bg-emerald-200";
-
-                speakText("Mercadinho das Compras!");
-            } else {
-                secMercado.classList.add('hidden');
-                secQuiz.classList.remove('hidden');
-
-                tabQuiz.className = "py-3 px-4 rounded-2xl font-bold text-lg sm:text-xl flex items-center justify-center gap-2 btn-bounce bg-sky-500 text-white shadow-lg";
-                tabMercado.className = "py-3 px-4 rounded-2xl font-bold text-lg sm:text-xl flex items-center justify-center gap-2 btn-bounce bg-white text-emerald-800 hover:bg-emerald-200";
-
-                renderQuizQuestion();
-                speakCurrentQuestion();
-            }
-        }
-
-        /* ====================================================================
-           5. LÓGICA DO MERCADINHO (CALCULADORA DE COMPRAS)
-           ==================================================================== */
-        function selectProduct(name, price, icon) {
-            selectedProduct = { name, unitPrice: price, icon };
-            playSound('pop');
-
-            // Atualiza visual dos botões
-            document.querySelectorAll('.prod-btn').forEach(btn => btn.classList.remove('selected-card'));
-            document.getElementById(`prod-${name}`).classList.add('selected-card');
-
-            updateMarketSummary();
-            speakText(`${name}. Custa ${price} moedas cada.`);
-        }
-
-        function selectQuantity(qty) {
-            selectedQuantity = qty;
-            playSound('pop');
-
-            // Atualiza visual dos botões
-            document.querySelectorAll('.qty-btn').forEach(btn => btn.classList.remove('selected-card'));
-            const qtyBtn = document.getElementById(`qty-${qty}`);
-            if (qtyBtn) qtyBtn.classList.add('selected-card');
-
-            updateMarketSummary();
-            speakText(`${qty} unidade${qty > 1 ? 's' : ''}.`);
-        }
-
-        function selectPayment(method, icon) {
-            selectedPayment = { name: method, icon };
-            playSound('pop');
-
-            // Atualiza visual dos botões
-            document.querySelectorAll('.pay-btn').forEach(btn => btn.classList.remove('selected-card'));
-            document.getElementById(`pay-${method}`).classList.add('selected-card');
-
-            updateMarketSummary();
-            speakText(`Pagamento no ${method}.`);
-        }
-
-        function updateMarketSummary() {
-            const totalPrice = selectedProduct.unitPrice * selectedQuantity;
-
-            // Renderiza as moedas
-            const coinsContainer = document.getElementById('coins-container');
-            coinsContainer.innerHTML = '';
-
-            for (let i = 0; i < totalPrice; i++) {
-                const coin = document.createElement('span');
-                coin.className = 'text-3xl sm:text-4xl animate-bounce';
-                coin.style.animationDelay = `${i * 0.1}s`;
-                coin.innerHTML = '🪙';
-                coinsContainer.appendChild(coin);
-            }
-
-            // Renderiza o resumo do texto
-            const summaryText = document.getElementById('cart-summary-text');
-            summaryText.innerHTML = `
-                ${selectedQuantity}x ${selectedProduct.icon} ${selectedProduct.name} = 
-                <span class="text-amber-600 font-extrabold">${totalPrice} Moeda${totalPrice > 1 ? 's' : ''}</span>
-                <span class="ml-2">${selectedPayment.icon}</span>
-            `;
-        }
-
-        function speakTotal() {
-            const totalPrice = selectedProduct.unitPrice * selectedQuantity;
-            const text = `Você escolheu ${selectedQuantity} ${selectedProduct.name}${selectedQuantity > 1 ? 's' : ''}. O total é de ${totalPrice} moeda${totalPrice > 1 ? 's' : ''}. Pagamento com ${selectedPayment.name}.`;
-            speakText(text);
-        }
-
-        function checkoutAndSpeak() {
-            playSound('correct');
-            triggerConfetti();
-            speakTotal();
-        }
-
-        /* ====================================================================
-           6. LÓGICA DO QUIZ INTERATIVO
-           ==================================================================== */
-        function renderQuizQuestion() {
-            const q = quizBank[currentQuestionIndex];
-            
-            document.getElementById('quiz-question-icon').innerText = q.questionIcon;
-            document.getElementById('quiz-question-text').innerText = q.questionText;
-
-            // Atualiza Estrelas
-            renderStars();
-
-            // Seleciona opções conforme o nível
-            const options = currentLevel === 1 ? q.optionsLevel1 : q.optionsLevel2;
-            const grid = document.getElementById('quiz-options-grid');
+        /* =====================================================================
+           LÓGICA DO MERCADINHO / CALCULADORA DE COMPRAS
+           ===================================================================== */
+        function renderizarProdutos() {
+            const grid = document.getElementById('grid-produtos');
             grid.innerHTML = '';
 
-            options.forEach(opt => {
+            CONFIG_PROFESSOR.produtos.forEach(prod => {
+                const qtd = carrinho[prod.id] || 0;
+                
+                const card = document.createElement('div');
+                card.className = `bg-slate-50 border-4 border-slate-200 rounded-3xl p-4 flex flex-col items-center justify-between shadow-md transition-all ${qtd > 0 ? 'card-selected' : ''}`;
+                card.innerHTML = `
+                    <div class="text-6xl mb-2">${prod.icone}</div>
+                    <div class="font-bold text-emerald-950 text-xl">${prod.nome}</div>
+                    <div class="bg-amber-200 text-amber-950 px-3 py-1 rounded-full text-sm font-bold my-2">
+                        R$ ${prod.preco},00
+                    </div>
+
+                    <!-- Controles de Quantidade (+ e -) -->
+                    <div class="flex items-center gap-3 mt-2 bg-white px-3 py-1.5 rounded-2xl border-2 border-slate-200">
+                        <button onclick="alterarQuantidade(${prod.id}, -1)" 
+                                class="w-10 h-10 bg-rose-500 hover:bg-rose-600 text-white font-bold text-2xl rounded-xl flex items-center justify-center btn-bounce">
+                            -
+                        </button>
+                        <span class="font-bold text-2xl text-slate-800 w-8 text-center">${qtd}</span>
+                        <button onclick="alterarQuantidade(${prod.id}, 1)" 
+                                class="w-10 h-10 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-2xl rounded-xl flex items-center justify-center btn-bounce">
+                            +
+                        </button>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+
+            atualizarResumoCompra();
+        }
+
+        function alterarQuantidade(idProduto, delta) {
+            tocarSom('click');
+            const qtdAtual = carrinho[idProduto] || 0;
+            const novaQtd = Math.max(0, qtdAtual + delta);
+            
+            if (novaQtd === 0) {
+                delete carrinho[idProduto];
+            } else {
+                carrinho[idProduto] = novaQtd;
+            }
+
+            const prod = CONFIG_PROFESSOR.produtos.find(p => p.id === idProduto);
+            if (delta > 0) {
+                falarTexto(`${prod.nome}. Quantidade: ${novaQtd}`);
+            }
+
+            renderizarProdutos();
+        }
+
+        function selecionarPagamento(metodo, icone) {
+            tocarSom('click');
+            pagamentoSelecionado = metodo;
+
+            document.querySelectorAll('.btn-pagamento').forEach(btn => btn.classList.remove('card-selected'));
+            document.getElementById(`pay-${metodo}`).classList.add('card-selected');
+
+            falarTexto(`Pagamento escolhido: ${metodo}`);
+            atualizarResumoCompra();
+        }
+
+        function calcularTotal() {
+            let total = 0;
+            for (let id in carrinho) {
+                const prod = CONFIG_PROFESSOR.produtos.find(p => p.id == id);
+                if (prod) {
+                    total += prod.preco * carrinho[id];
+                }
+            }
+            return total;
+        }
+
+        function atualizarResumoCompra() {
+            const total = calcularTotal();
+
+            // Renderização das Moedas Visuais 🪙 (1 moeda por Real)
+            const containerMoedas = document.getElementById('container-moedas');
+            containerMoedas.innerHTML = '';
+
+            if (total === 0) {
+                containerMoedas.innerHTML = '<span class="text-amber-700 text-sm">Adicione produtos para ver as moedas!</span>';
+            } else {
+                for (let i = 0; i < total; i++) {
+                    const moeda = document.createElement('span');
+                    moeda.className = 'text-3xl sm:text-4xl animate-bounce';
+                    moeda.style.animationDelay = `${i * 0.05}s`;
+                    moeda.innerHTML = '🪙';
+                    containerMoedas.appendChild(moeda);
+                }
+            }
+
+            // Texto de resumo
+            const textoResumo = document.getElementById('resumo-compra-texto');
+            const itensNomes = [];
+            for (let id in carrinho) {
+                const prod = CONFIG_PROFESSOR.produtos.find(p => p.id == id);
+                if (prod) itensNomes.push(`${carrinho[id]}x ${prod.nome}`);
+            }
+
+            if (itensNomes.length === 0) {
+                textoResumo.innerHTML = "Nenhum item selecionado.";
+            } else {
+                textoResumo.innerHTML = `
+                    ${itensNomes.join(', ')} = 
+                    <span class="text-amber-600 font-extrabold">R$ ${total},00</span>
+                    <span class="ml-2">(${pagamentoSelecionado})</span>
+                `;
+            }
+        }
+
+        function obterTextoCompraNarrativa() {
+            const total = calcularTotal();
+            const itensArray = [];
+            for (let id in carrinho) {
+                const prod = CONFIG_PROFESSOR.produtos.find(p => p.id == id);
+                if (prod) {
+                    itensArray.push(`${carrinho[id]} ${prod.nome}${carrinho[id] > 1 ? 's' : ''}`);
+                }
+            }
+
+            if (itensArray.length === 0) {
+                return "Sua lista de compras está vazia. Adicione alguns produtos!";
+            }
+
+            return `Sua compra de ${itensArray.join(' e ')} deu o total de ${total} reais. Forma de pagamento: ${pagamentoSelecionado}.`;
+        }
+
+        function ouvirResumoCompra() {
+            falarTexto(obterTextoCompraNarrativa());
+        }
+
+        function finalizarCompra() {
+            tocarSom('acerto');
+            dispararConfeti();
+            falarTexto("Parabéns pela compra! " + obterTextoCompraNarrativa());
+        }
+
+        /* =====================================================================
+           LÓGICA DO QUIZ INTERATIVO
+           ===================================================================== */
+        function renderizarPerguntaQuiz() {
+            const q = CONFIG_PROFESSOR.quiz[quizIndiceAtual];
+
+            document.getElementById('quiz-pergunta-icone').innerText = q.iconePergunta || "❓";
+            document.getElementById('quiz-pergunta-texto').innerText = q.pergunta;
+
+            atualizarEstrelasPlacar();
+
+            const grid = document.getElementById('quiz-opcoes-grid');
+            grid.innerHTML = '';
+
+            q.opcoes.forEach(opt => {
                 const btn = document.createElement('button');
                 btn.className = "bg-slate-50 border-4 border-sky-200 hover:border-sky-400 rounded-3xl p-6 flex flex-col items-center btn-bounce shadow-md";
-                btn.onclick = () => checkQuizAnswer(opt.name);
+                btn.onclick = () => verificarRespostaQuiz(opt.texto);
                 btn.innerHTML = `
-                    <span class="text-7xl sm:text-8xl mb-3">${opt.icon}</span>
-                    <span class="font-bold text-sky-950 text-2xl">${opt.name}</span>
+                    <span class="text-7xl sm:text-8xl mb-3">${opt.icone}</span>
+                    <span class="font-bold text-sky-950 text-2xl">${opt.texto}</span>
                 `;
                 grid.appendChild(btn);
             });
 
-            // Limpa feedback
+            // Limpa o feedback anterior
             const feedback = document.getElementById('quiz-feedback');
             feedback.className = "mt-6 p-4 rounded-2xl text-center font-bold text-xl hidden";
         }
 
-        function speakCurrentQuestion() {
-            const q = quizBank[currentQuestionIndex];
-            speakText(q.questionText);
+        function ouvirPerguntaAtual() {
+            const q = CONFIG_PROFESSOR.quiz[quizIndiceAtual];
+            falarTexto(q.pergunta);
         }
 
-        function checkQuizAnswer(selectedName) {
-            const q = quizBank[currentQuestionIndex];
+        function verificarRespostaQuiz(opcaoSelecionada) {
+            const q = CONFIG_PROFESSOR.quiz[quizIndiceAtual];
             const feedback = document.getElementById('quiz-feedback');
             feedback.classList.remove('hidden');
 
-            if (selectedName === q.correctAnswer) {
-                // Resposta Correta
-                playSound('correct');
-                quizScore++;
-                renderStars();
+            if (opcaoSelecionada === q.respostaCorreta) {
+                tocarSom('acerto');
+                quizPontuacao++;
+                atualizarEstrelasPlacar();
 
-                feedback.className = "mt-6 p-4 rounded-2xl text-center font-bold text-2xl bg-emerald-100 text-emerald-800 border-2 border-emerald-400 animate-pulse";
-                feedback.innerHTML = "✨ CORRETO! PARABÉNS! 🎉";
-                speakText("Correto! Muito bem!");
+                feedback.className = "mt-6 p-4 rounded-2xl text-center font-bold text-2xl bg-emerald-100 text-emerald-900 border-2 border-emerald-400 animate-bounce";
+                feedback.innerHTML = "✨ CORRETO! MUITO BEM! 🎉";
+                falarTexto("Muito bem! Resposta correta!");
 
-                // Avança pergunta após 2.5s
                 setTimeout(() => {
-                    if (currentQuestionIndex < quizBank.length - 1) {
-                        currentQuestionIndex++;
-                        renderQuizQuestion();
-                        speakCurrentQuestion();
+                    if (quizIndiceAtual < CONFIG_PROFESSOR.quiz.length - 1) {
+                        quizIndiceAtual++;
+                        renderizarPerguntaQuiz();
+                        ouvirPerguntaAtual();
                     } else {
-                        // Fim do Quiz - Vitória!
-                        showVictoryModal();
+                        exibirModalVitoria();
                     }
-                }, 2200);
+                }, 2000);
 
             } else {
-                // Resposta Incorreta
-                playSound('wrong');
-                feedback.className = "mt-6 p-4 rounded-2xl text-center font-bold text-2xl bg-rose-100 text-rose-800 border-2 border-rose-400";
+                tocarSom('erro');
+                feedback.className = "mt-6 p-4 rounded-2xl text-center font-bold text-2xl bg-rose-100 text-rose-900 border-2 border-rose-400";
                 feedback.innerHTML = "Ops! Tente novamente! 💡";
-                speakText("Ops! Tente novamente!");
+                falarTexto("Ops! Tente novamente!");
             }
         }
 
-        function renderStars() {
-            const container = document.getElementById('quiz-stars');
-            let starsHtml = '';
-            for (let i = 0; i < quizBank.length; i++) {
-                if (i < quizScore) {
-                    starsHtml += '⭐';
-                } else {
-                    starsHtml += '⚪';
-                }
+        function atualizarEstrelasPlacar() {
+            const container = document.getElementById('quiz-placar-estrelas');
+            let html = '';
+            for (let i = 0; i < CONFIG_PROFESSOR.quiz.length; i++) {
+                html += (i < quizPontuacao) ? '⭐' : '⚪';
             }
-            container.innerHTML = starsHtml;
+            container.innerHTML = html;
         }
 
-        function showVictoryModal() {
-            triggerConfetti();
-            playSound('correct');
+        function exibirModalVitoria() {
+            dispararConfeti();
+            tocarSom('acerto');
 
-            const modal = document.getElementById('modal-victory');
-            modal.classList.remove('hidden');
-            document.getElementById('modal-stars').innerText = '⭐'.repeat(quizScore);
+            document.getElementById('modal-estrelas-final').innerText = '⭐'.repeat(quizPontuacao);
+            document.getElementById('modal-vitoria').classList.remove('hidden');
 
-            speakText("Parabéns! Você concluiu o quiz e ganhou todas as estrelas!");
+            falarTexto("Parabéns! Você completou todas as perguntas do quiz!");
         }
 
-        function restartQuiz() {
-            playSound('pop');
-            currentQuestionIndex = 0;
-            quizScore = 0;
-            document.getElementById('modal-victory').classList.add('hidden');
-            renderQuizQuestion();
-            speakCurrentQuestion();
+        function reiniciarQuiz() {
+            tocarSom('click');
+            quizIndiceAtual = 0;
+            quizPontuacao = 0;
+            document.getElementById('modal-vitoria').classList.add('hidden');
+            renderizarPerguntaQuiz();
+            ouvirPerguntaAtual();
         }
 
-        /* ====================================================================
-           7. ANIMAÇÃO DE CONFETE (EFEITO CELEBRAÇÃO)
-           ==================================================================== */
-        function triggerConfetti() {
+        /* =====================================================================
+           NAVEGAÇÃO ENTRE ABAS
+           ===================================================================== */
+        function trocarAba(aba) {
+            tocarSom('click');
+            const secMercadinho = document.getElementById('sec-mercadinho');
+            const secQuiz = document.getElementById('sec-quiz');
+            const btnMercadinho = document.getElementById('aba-mercadinho');
+            const btnQuiz = document.getElementById('aba-quiz');
+
+            if (aba === 'mercadinho') {
+                secMercadinho.classList.remove('hidden');
+                secQuiz.classList.add('hidden');
+
+                btnMercadinho.className = "py-3 px-4 rounded-2xl font-bold text-lg sm:text-xl flex items-center justify-center gap-2 btn-bounce bg-emerald-500 text-white shadow-lg";
+                btnQuiz.className = "py-3 px-4 rounded-2xl font-bold text-lg sm:text-xl flex items-center justify-center gap-2 btn-bounce bg-white text-emerald-800 hover:bg-emerald-200";
+
+                falarTexto("Atividade do Mercadinho.");
+            } else {
+                secMercadinho.classList.add('hidden');
+                secQuiz.classList.remove('hidden');
+
+                btnQuiz.className = "py-3 px-4 rounded-2xl font-bold text-lg sm:text-xl flex items-center justify-center gap-2 btn-bounce bg-sky-500 text-white shadow-lg";
+                btnMercadinho.className = "py-3 px-4 rounded-2xl font-bold text-lg sm:text-xl flex items-center justify-center gap-2 btn-bounce bg-white text-emerald-800 hover:bg-emerald-200";
+
+                renderizarPerguntaQuiz();
+                ouvirPerguntaAtual();
+            }
+        }
+
+        /* =====================================================================
+           EFEITO DE CONFETES (CANVAS)
+           ===================================================================== */
+        function dispararConfeti() {
             const canvas = document.getElementById('confetti-canvas');
             const ctx = canvas.getContext('2d');
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
 
-            const particles = [];
-            const colors = ['#f59e0b', '#10b981', '#3b82f6', '#ec4899', '#8b5cf6'];
+            const particulas = [];
+            const cores = ['#f59e0b', '#10b981', '#3b82f6', '#ec4899', '#8b5cf6'];
 
-            for (let i = 0; i < 80; i++) {
-                particles.push({
+            for (let i = 0; i < 90; i++) {
+                particulas.push({
                     x: canvas.width / 2,
                     y: canvas.height / 2,
-                    vx: (Math.random() - 0.5) * 12,
-                    vy: (Math.random() - 0.5) * 12 - 4,
-                    size: Math.random() * 10 + 6,
-                    color: colors[Math.floor(Math.random() * colors.length)],
-                    life: 100
+                    vx: (Math.random() - 0.5) * 14,
+                    vy: (Math.random() - 0.5) * 14 - 3,
+                    tamanho: Math.random() * 10 + 6,
+                    cor: cores[Math.floor(Math.random() * cores.length)],
+                    vida: 100
                 });
             }
 
-            function animateConfetti() {
+            function animar() {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
-                let alive = false;
+                let aindaVivo = false;
 
-                particles.forEach(p => {
-                    if (p.life > 0) {
-                        alive = true;
+                particulas.forEach(p => {
+                    if (p.vida > 0) {
+                        aindaVivo = true;
                         p.x += p.vx;
                         p.y += p.vy;
-                        p.vy += 0.2; // Gravidade
-                        p.life -= 1.5;
+                        p.vy += 0.2; // Efeito gravidade
+                        p.vida -= 1.4;
 
-                        ctx.fillStyle = p.color;
+                        ctx.fillStyle = p.cor;
                         ctx.beginPath();
-                        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                        ctx.arc(p.x, p.y, p.tamanho, 0, Math.PI * 2);
                         ctx.fill();
                     }
                 });
 
-                if (alive) {
-                    requestAnimationFrame(animateConfetti);
+                if (aindaVivo) {
+                    requestAnimationFrame(animar);
                 } else {
                     ctx.clearRect(0, 0, canvas.width, canvas.height);
                 }
             }
 
-            animateConfetti();
+            animar();
         }
 
-        /* ====================================================================
-           8. UTILITÁRIOS
-           ==================================================================== */
-        function toggleTeacherInstructions() {
-            const panel = document.getElementById('teacher-instructions');
-            panel.classList.toggle('hidden');
+        /* =====================================================================
+           MODAL DO PROFESSOR
+           ===================================================================== */
+        function abrirModalProfessor() {
+            document.getElementById('modal-professor').classList.remove('hidden');
+        }
+        function fecharModalProfessor() {
+            document.getElementById('modal-professor').classList.add('hidden');
         }
 
-        // Inicialização ao carregar a página
+        /* INICIALIZAÇÃO DA PÁGINA */
         window.onload = function() {
-            // Seleção padrão do produto e quantidade iniciais
-            selectProduct('Sorvete', 2, '🍦');
-            selectQuantity(1);
-            selectPayment('Pix', '📱');
+            renderizarProdutos();
+            // Seleção inicial da primeira forma de pagamento
+            selecionarPagamento('Pix', '📱');
         };
     </script>
 </body>
