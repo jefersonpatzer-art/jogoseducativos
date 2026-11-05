@@ -11,13 +11,12 @@ const app = express();
 app.use(cors()); // Permite requisições vindas de qualquer link (inclusive GitHub Pages)
 app.use(express.json());
 
-// CONFIGURAÇÃO DA CONEXÃO COM O MYSQL (Nuvem ou Local)
 const db = mysql.createPool({
-    host: 'SEU_HOST_AQUI',       // Ex: mysql.aivencloud.com ou localhost
-    port: 3306,                  // Porta padrão MySQL (ou a fornecida pelo provedor)
-    user: 'SEU_USUARIO_AQUI',    // Ex: root ou avnadmin
-    password: 'SUA_SENHA_AQUI',  // Sua senha do MySQL
-    database: 'escola_digital',
+    host: process.env.MYSQLHOST || 'iriguchi.proxy.rlwy.net',
+    port: process.env.MYSQLPORT || 58507, // Porta de 5 dígitos do Railway
+    user: process.env.MYSQLUSER || 'root',
+    password: process.env.MYSQLPASSWORD || 'WxTabLGohyNQooAqRlUpdcOMlSKMsAFc',
+    database: process.env.MYSQLDATABASE || 'notas_Jogos_educativos', // Ou o nome do Schema que você criou no Workbench
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0
@@ -28,7 +27,7 @@ db.getConnection((err, connection) => {
     if (err) {
         console.error('❌ Erro ao conectar ao MySQL:', err.message);
     } else {
-        console.log('✅ Conectado com sucesso ao MySQL Workbench!');
+        console.log('✅ Conectado com sucesso ao MySQL no Railway!');
         connection.release();
     }
 });
