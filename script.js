@@ -202,8 +202,8 @@ const CONFIG_PROFESSOR = {
 let dadosAluno = { nome: "", numero: "", turma: "" };
 let quizIndiceAtual = 0;
 let quizPontuacao = 0;
-let nivelFiltroAtual = 0; // 0 = Todos
-let progressoDesafios = new Set(); // Guarda os IDs dos desafios já testados
+let nivelFiltroAtual = 0;
+let progressoDesafios = new Set();
 
 /* --------------------------------------------------------------------------
    FUNÇÕES DE ÁUDIO E VOZ PROTEGIDAS CONTRA ERROS
@@ -260,7 +260,7 @@ function tocarSom(tipo) {
 }
 
 /* --------------------------------------------------------------------------
-   CADASTRO BLINDADO (GARANTE O FECHAMENTO DO MODAL)
+   CADASTRO BLINDADO
    -------------------------------------------------------------------------- */
 function salvarCadastro(event) {
     if (event) event.preventDefault();
@@ -270,10 +270,7 @@ function salvarCadastro(event) {
         const numeroInput = document.getElementById('cad-numero');
         const turmaInput = document.getElementById('cad-turma');
 
-        if (!nomeInput || !numeroInput || !turmaInput) {
-            console.error("Campos do formulário não encontrados!");
-            return;
-        }
+        if (!nomeInput || !numeroInput || !turmaInput) return;
 
         const nome = nomeInput.value.trim();
         const numero = numeroInput.value.trim();
@@ -281,30 +278,22 @@ function salvarCadastro(event) {
 
         if (!nome || !numero || !turma) return;
 
-        // 1. Salva os dados no objeto global
         dadosAluno = { nome, numero, turma };
 
-        // 2. Atualiza a identificação no topo
         const identElem = document.getElementById('identificacao-aluno');
         if (identElem) {
             identElem.innerText = `Estudante: ${nome} (Nº ${numero}) - ${turma}`;
         }
 
-        // 3. OCULTA O MODAL DE CADASTRO
         const telaCad = document.getElementById('tela-cadastro');
-        if (telaCad) {
-            telaCad.classList.add('hidden');
-        }
+        if (telaCad) telaCad.classList.add('hidden');
 
-        // 4. Efeitos sonoros e renderização
         tocarSom('acerto');
         renderizarDesafiosVisuais();
         falarTexto(`Olá, ${nome}! Vamos brincar e aprender com o Robô! Escolha um nível para começar!`);
 
     } catch (err) {
         console.error("Erro no cadastro:", err);
-        
-        // Força a ocultação da tela mesmo se houver erro visual/áudio
         const telaCad = document.getElementById('tela-cadastro');
         if (telaCad) telaCad.classList.add('hidden');
     }
@@ -410,7 +399,7 @@ function atualizarBarraProgresso() {
 }
 
 /* --------------------------------------------------------------------------
-   FUNÇÕES DE NAVEGAÇÃO DO QUIZ E MODAL DE VITÓRIA
+   NAVEGAÇÃO DO QUIZ E MODAL DE VITÓRIA
    -------------------------------------------------------------------------- */
 function fecharModalVitoria() {
     tocarSom('click');
