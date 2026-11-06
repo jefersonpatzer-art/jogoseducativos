@@ -20,6 +20,9 @@ const db = mysql.createPool({
     user: process.env.MYSQLUSER || 'root',
     password: process.env.MYSQLPASSWORD || 'WxTabLGohyNQooAqRlUpdcOMlSKMsAFc',
     database: process.env.MYSQLDATABASE || 'railway',
+  ssl: {
+        rejectUnauthorized: false // Permite o SSL exigir criptografia sem falhar a validação do certificado
+    },
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0
