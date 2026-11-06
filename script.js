@@ -205,67 +205,110 @@ let quizPontuacao = 0;
 let nivelFiltroAtual = 0; // 0 = Todos
 let progressoDesafios = new Set(); // Guarda os IDs dos desafios já testados
 
+/* --------------------------------------------------------------------------
+   FUNÇÕES DE ÁUDIO E VOZ PROTEGIDAS CONTRA ERROS
+   -------------------------------------------------------------------------- */
 function falarTexto(texto) {
-    if ('speechSynthesis' in window) {
-        window.speechSynthesis.cancel();
-        const fala = new SpeechSynthesisUtterance(texto);
-        fala.lang = 'pt-BR';
-        fala.rate = 0.85;
-        fala.pitch = 1.1;
-        window.speechSynthesis.speak(fala);
+    try {
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+            const fala = new SpeechSynthesisUtterance(texto);
+            fala.lang = 'pt-BR';
+            fala.rate = 0.85;
+            fala.pitch = 1.1;
+            window.speechSynthesis.speak(fala);
+        }
+    } catch (e) {
+        console.warn('Síntese de voz indisponível ou bloqueada:', e);
     }
 }
 
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
 function tocarSom(tipo) {
-    if (audioCtx.state === 'suspended') audioCtx.resume();
-    const osc = audioCtx.createOscillator();
-    const gain = audioCtx.createGain();
-    osc.connect(gain);
-    gain.connect(audioCtx.destination);
-    const agora = audioCtx.currentTime;
+    try {
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        const agora = audioCtx.currentTime;
 
-    if (tipo === 'click') {
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(450, agora);
-        gain.gain.setValueAtTime(0.2, agora);
-        osc.start(agora);
-        osc.stop(agora + 0.1);
-    } else if (tipo === 'acerto') {
-        osc.type = 'triangle';
-        osc.frequency.setValueAtTime(523.25, agora);
-        osc.frequency.setValueAtTime(659.25, agora + 0.1);
-        gain.gain.setValueAtTime(0.3, agora);
-        osc.start(agora);
-        osc.stop(agora + 0.35);
-    } else if (tipo === 'erro') {
-        osc.type = 'sawtooth';
-        osc.frequency.setValueAtTime(200, agora);
-        gain.gain.setValueAtTime(0.3, agora);
-        osc.start(agora);
-        osc.stop(agora + 0.25);
+        if (tipo === 'click') {
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(450, agora);
+            gain.gain.setValueAtTime(0.2, agora);
+            osc.start(agora);
+            osc.stop(agora + 0.1);
+        } else if (tipo === 'acerto') {
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(523.25, agora);
+            osc.frequency.setValueAtTime(659.25, agora + 0.1);
+            gain.gain.setValueAtTime(0.3, agora);
+            osc.start(agora);
+            osc.stop(agora + 0.35);
+        } else if (tipo === 'erro') {
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(200, agora);
+            gain.gain.setValueAtTime(0.3, agora);
+            osc.start(agora);
+            osc.stop(agora + 0.25);
+        }
+    } catch (e) {
+        console.warn('Áudio Web indisponível:', e);
     }
 }
 
+/* --------------------------------------------------------------------------
+   CADASTRO BLINDADO (GARANTE O FECHAMENTO DO MODAL)
+   -------------------------------------------------------------------------- */
 function salvarCadastro(event) {
-    event.preventDefault();
-    tocarSom('acerto');
+    if (event) event.preventDefault();
 
-    const nome = document.getElementById('cad-nome').value.trim();
-    const numero = document.getElementById('cad-numero').value.trim();
-    const turma = document.getElementById('cad-turma').value.trim();
+    try {
+        const nomeInput = document.getElementById('cad-nome');
+        const numeroInput = document.getElementById('cad-numero');
+        const turmaInput = document.getElementById('cad-turma');
 
-    if (!nome || !numero || !turma) return;
+        if (!nomeInput || !numeroInput || !turmaInput) {
+            console.error("Campos do formulário não encontrados!");
+            return;
+        }
 
-    dadosAluno = { nome, numero, turma };
-    document.getElementById('identificacao-aluno').innerText = `Estudante: ${nome} (Nº ${numero}) - ${turma}`;
-    document.getElementById('tela-cadastro').classList.add('hidden');
+        const nome = nomeInput.value.trim();
+        const numero = numeroInput.value.trim();
+        const turma = turmaInput.value.trim();
 
-    renderizarDesafiosVisuais();
-    falarTexto(`Olá, ${nome}! Vamos brincar e aprender com o Robô! Escolha um nível para começar!`);
+        if (!nome || !numero || !turma) return;
+
+        // 1. Salva os dados no objeto global
+        dadosAluno = { nome, numero, turma };
+
+        // 2. Atualiza a identificação no topo
+        const identElem = document.getElementById('identificacao-aluno');
+        if (identElem) {
+            identElem.innerText = `Estudante: ${nome} (Nº ${numero}) - ${turma}`;
+        }
+
+        // 3. OCULTA O MODAL DE CADASTRO
+        const telaCad = document.getElementById('tela-cadastro');
+        if (telaCad) {
+            telaCad.classList.add('hidden');
+        }
+
+        // 4. Efeitos sonoros e renderização
+        tocarSom('acerto');
+        renderizarDesafiosVisuais();
+        falarTexto(`Olá, ${nome}! Vamos brincar e aprender com o Robô! Escolha um nível para começar!`);
+
+    } catch (err) {
+        console.error("Erro no cadastro:", err);
+        
+        // Força a ocultação da tela mesmo se houver erro visual/áudio
+        const telaCad = document.getElementById('tela-cadastro');
+        if (telaCad) telaCad.classList.add('hidden');
+    }
 }
-
 /* Lógica de Níveis e Progresso na Aba 1 */
 function filtrarNivel(nivel) {
     tocarSom('click');
