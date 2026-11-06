@@ -117,51 +117,65 @@
             <div id="grid-produtos" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
         </section>
 
-        <!-- ABA 2: QUIZ DE LÓGICA -->
-        <section id="sec-quiz" class="hidden">
-            <div id="quiz-introducao-box"></div>
+      <!-- ABA 2: QUIZ DE LÓGICA -->
+<section id="sec-quiz" class="hidden">
+    <div id="quiz-introducao-box"></div>
 
-            <div class="bg-white border-4 border-sky-300 rounded-3xl p-6 shadow-xl">
-                <div class="flex items-center justify-between border-b-2 border-slate-100 pb-4 mb-4">
-                    <span id="quiz-numero-questao" class="font-extrabold text-sky-700 text-lg">Pergunta 1 de 10</span>
-                    <span id="quiz-pergunta-icone" class="text-4xl">❓</span>
-                </div>
+    <div class="bg-white border-4 border-sky-300 rounded-3xl p-6 shadow-xl">
+        <div class="flex items-center justify-between border-b-2 border-slate-100 pb-4 mb-4">
+            <!-- Botão de Voltar Questão -->
+            <button id="btn-voltar-questao" onclick="voltarPerguntaQuiz()" class="bg-sky-100 hover:bg-sky-200 text-sky-900 font-bold px-3.5 py-1.5 rounded-xl text-sm flex items-center gap-1 btn-bounce hidden">
+                ⬅️ Anterior
+            </button>
+            <span id="quiz-numero-questao" class="font-extrabold text-sky-700 text-lg">Pergunta 1 de 10</span>
+            <span id="quiz-pergunta-icone" class="text-4xl">❓</span>
+        </div>
 
-                <h3 id="quiz-pergunta-texto" class="text-xl sm:text-2xl font-extrabold text-slate-800 mb-6 leading-relaxed">
-                    Carregando pergunta...
-                </h3>
+        <h3 id="quiz-pergunta-texto" class="text-xl sm:text-2xl font-extrabold text-slate-800 mb-6 leading-relaxed">
+            Carregando pergunta...
+        </h3>
 
-                <!-- Grid de Opções -->
-                <div id="quiz-opcoes-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
+        <!-- Grid de Opções -->
+        <div id="quiz-opcoes-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
 
-                <!-- Feedback Visual e Sonoro -->
-                <div id="quiz-feedback" class="mt-6 p-4 rounded-3xl text-center font-extrabold text-2xl hidden"></div>
-            </div>
-        </section>
-
+        <!-- Feedback Visual e Sonoro -->
+        <div id="quiz-feedback" class="mt-6 p-4 rounded-3xl text-center font-extrabold text-2xl hidden"></div>
+    </div>
+</section>
     </main>
 
-    <!-- Modal de Vitória -->
-    <div id="modal-vitoria" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl border-4 border-amber-400 text-center">
-            <div class="text-6xl mb-3 animate-bounce">🏆</div>
-            <h2 class="text-3xl font-black text-amber-600 mb-1">Parabéns!</h2>
-            <p class="text-slate-600 font-bold mb-4">Você concluiu o Desafio do Robô!</p>
+  <!-- Modal de Vitória com Botão de Fechar e Voltar -->
+<div id="modal-vitoria" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl border-4 border-amber-400 text-center relative">
+        
+        <!-- Botão X no canto superior direito -->
+        <button onclick="fecharModalVitoria()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-700 font-extrabold text-2xl w-10 h-10 rounded-full flex items-center justify-center hover:bg-slate-100 transition">
+            ✕
+        </button>
 
-            <div class="bg-slate-50 border-2 border-slate-200 rounded-2xl p-4 text-left space-y-2 mb-6">
-                <p id="res-aluno-nome" class="font-bold text-slate-800">Estudante: -</p>
-                <p id="res-aluno-turma" class="font-bold text-slate-600">Turma: -</p>
-                <div class="border-t border-slate-200 my-2 pt-2">
-                    <p id="res-nota-final" class="text-2xl font-black text-emerald-600">Nota Final: 0.0</p>
-                    <p id="res-acertos-detalhe" class="text-xs font-bold text-slate-500">Acertos: 0 de 10 questões</p>
-                </div>
+        <div class="text-6xl mb-3 animate-bounce">🏆</div>
+        <h2 class="text-3xl font-black text-amber-600 mb-1">Parabéns!</h2>
+        <p class="text-slate-600 font-bold mb-4">Você concluiu o Desafio do Robô!</p>
+
+        <div class="bg-slate-50 border-2 border-slate-200 rounded-2xl p-4 text-left space-y-2 mb-6">
+            <p id="res-aluno-nome" class="font-bold text-slate-800">Estudante: -</p>
+            <p id="res-aluno-turma" class="font-bold text-slate-600">Turma: -</p>
+            <div class="border-t border-slate-200 my-2 pt-2">
+                <p id="res-nota-final" class="text-2xl font-black text-emerald-600">Nota Final: 0.0</p>
+                <p id="res-acertos-detalhe" class="text-xs font-bold text-slate-500">Acertos: 0 de 10 questões</p>
             </div>
+        </div>
 
+        <div class="flex flex-col gap-3">
+            <button onclick="fecharModalVitoria()" class="w-full bg-slate-200 hover:bg-slate-300 text-slate-800 font-extrabold py-3.5 px-6 rounded-2xl text-lg flex items-center justify-center gap-2 btn-bounce shadow-md">
+                👀 Voltar para as Questões / Fechar
+            </button>
             <button onclick="reiniciarQuiz()" class="w-full bg-amber-400 hover:bg-amber-500 text-amber-950 font-extrabold py-3.5 px-6 rounded-2xl text-lg flex items-center justify-center gap-2 btn-bounce shadow-md">
                 🔄 Fazer Novamente
             </button>
         </div>
     </div>
+</div>
 
 <!-- Mude de <script src="script.js"></script> para: -->
 <script src="script.js?v=2"></script>
