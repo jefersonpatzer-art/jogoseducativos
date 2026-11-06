@@ -16,16 +16,22 @@ app.use(express.json());
 // Conexão com a base de dados MySQL no Railway via Pool
 const db = mysql.createPool({
     host: process.env.MYSQLHOST || 'acela.proxy.rlwy.net',
-    port: process.env.MYSQLPORT || 23268 ,
+    port: process.env.MYSQLPORT || 23268,
     user: process.env.MYSQLUSER || 'root',
     password: process.env.MYSQLPASSWORD || 'WxTabLGohyNQooAqRlUpdcOMlSKMsAFc',
     database: process.env.MYSQLDATABASE || 'railway',
-  ssl: {
-        rejectUnauthorized: false // Permite o SSL exigir criptografia sem falhar a validação do certificado
+    ssl: {
+        rejectUnauthorized: false // Permite SSL sem falhar a validação estrita do certificado
     },
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0
+});
+
+// Ajuste temporário de autenticação para liberar a conexão no MySQL Workbench
+db.query("ALTER USER 'root'@'%' IDENTIFIED WITH mysql_native_password BY 'WxTabLGohyNQooAqRlUpdcOMlSKMsAFc';", (err) => {
+    if (err) console.log("Aviso de alteração de autenticação:", err.message);
+    else console.log("✅ Autenticação do MySQL ajustada com sucesso para mysql_native_password!");
 });
 
 // Teste inicial de conexão
