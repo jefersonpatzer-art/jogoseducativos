@@ -15,8 +15,8 @@ app.use(express.json());
 
 // Conexão com a base de dados MySQL no Railway via Pool
 const db = mysql.createPool({
-    host: process.env.MYSQLHOST || 'iriguchi.proxy.rlwy.net',
-    port: process.env.MYSQLPORT || 58507,
+    host: process.env.MYSQLHOST || 'acela.proxy.rlwy.net',
+    port: process.env.MYSQLPORT || 23268 ,
     user: process.env.MYSQLUSER || 'root',
     password: process.env.MYSQLPASSWORD || 'WxTabLGohyNQooAqRlUpdcOMlSKMsAFc',
     database: process.env.MYSQLDATABASE || 'railway',
