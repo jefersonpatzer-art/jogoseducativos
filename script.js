@@ -79,7 +79,7 @@ const CONFIG_PROFESSOR = {
         {
             pergunta: "Q1. Quando você digita uma mensagem no teclado, o que entra para o robô?",
             iconePergunta: "⌨️",
-            respostaCorreta: "Texto e Letras", // POSIÇÃO: A
+            respostaCorreta: "Texto e Letras",
             dica: "Tudo o que a gente digita no teclado entra como letras e texto!",
             opcoes: [
                 { letra: "A", texto: "Texto e Letras", icone: "🔤" },
@@ -91,7 +91,7 @@ const CONFIG_PROFESSOR = {
         {
             pergunta: "Q2. Em qual lugar o robô pensa e faz as continhas?",
             iconePergunta: "🧠",
-            respostaCorreta: "No Processamento (Pensando)", // POSIÇÃO: B
+            respostaCorreta: "No Processamento (Pensando)",
             dica: "A cabecinha do robô usa o processamento para pensar e calcular!",
             opcoes: [
                 { letra: "A", texto: "Na caixa de som", icone: "🔊" },
@@ -103,7 +103,7 @@ const CONFIG_PROFESSOR = {
         {
             pergunta: "Q3. Para o robô mostrar um coração feliz na tela, usamos o comando de:",
             iconePergunta: "🖥️",
-            respostaCorreta: "Mostrar na Tela (Saída)", // POSIÇÃO: C
+            respostaCorreta: "Mostrar na Tela (Saída)",
             dica: "O comando de saída faz o robô mostrar desenhos e mensagens na tela!",
             opcoes: [
                 { letra: "A", texto: "Apagar a luz", icone: "🧹" },
@@ -115,7 +115,7 @@ const CONFIG_PROFESSOR = {
         {
             pergunta: "Q4. No sinal VERMELHO (🔴), o que o robô deve fazer?",
             iconePergunta: "🚦",
-            respostaCorreta: "Parar imediatamente!", // POSIÇÃO: D
+            respostaCorreta: "Parar imediatamente!",
             dica: "Sinal vermelho é para parar! O robô só anda no verde!",
             opcoes: [
                 { letra: "A", texto: "Sair correndo bem rápido", icone: "🏃" },
@@ -127,7 +127,7 @@ const CONFIG_PROFESSOR = {
         {
             pergunta: "Q5. SE tiver comida, o robô come. SENÃO, ele vai brincar. Que comando faz essa escolha?",
             iconePergunta: "🔀",
-            respostaCorreta: "SE ... SENÃO (Escolha)", // POSIÇÃO: B
+            respostaCorreta: "SE ... SENÃO (Escolha)",
             dica: "Usamos o SE para uma escolha e o SENÃO para a outra!",
             opcoes: [
                 { letra: "A", texto: "Chorar alto", icone: "😭" },
@@ -139,7 +139,7 @@ const CONFIG_PROFESSOR = {
         {
             pergunta: "Q6. Qual é o melhor lugar para guardar vários brinquedos juntos?",
             iconePergunta: "📦",
-            respostaCorreta: "No Baú de Brinquedos (Lista)", // POSIÇÃO: C
+            respostaCorreta: "No Baú de Brinquedos (Lista)",
             dica: "A lista é como um baú onde cabem muitos itens juntos!",
             opcoes: [
                 { letra: "A", texto: "Na lixeira", icone: "🗑️" },
@@ -151,7 +151,7 @@ const CONFIG_PROFESSOR = {
         {
             pergunta: "Q7. Para colocar um ursinho NO FINAL do baú de brinquedos, o que fazemos?",
             iconePergunta: "🧸",
-            respostaCorreta: "Guardar no Final (.append)", // POSIÇÃO: A
+            respostaCorreta: "Guardar no Final (.append)",
             dica: "O comando append empurra o brinquedo novo para o final do baú!",
             opcoes: [
                 { letra: "A", texto: "Guardar no Final (.append)", icone: "➕" },
@@ -163,7 +163,7 @@ const CONFIG_PROFESSOR = {
         {
             pergunta: "Q8. Para o robô dar 3 pulinhos ou dançar sem parar, usamos o comando de:",
             iconePergunta: "💃",
-            respostaCorreta: "Repetir (Girar em Loop)", // POSIÇÃO: D
+            respostaCorreta: "Repetir (Girar em Loop)",
             dica: "O laço de repetição faz a mesma ação várias vezes sem cansar!",
             opcoes: [
                 { letra: "A", texto: "Ficar estátua parado", icone: "🗿" },
@@ -175,7 +175,7 @@ const CONFIG_PROFESSOR = {
         {
             pergunta: "Q9. O robô vai dançar ENQUANTO tocar a música. Qual é esse comando?",
             iconePergunta: "⏳",
-            respostaCorreta: "ENQUANTO (while)", // POSIÇÃO: B
+            respostaCorreta: "ENQUANTO (while)",
             dica: "O WHILE repete a brincadeira até a música parar!",
             opcoes: [
                 { letra: "A", texto: "Parar de vez", icone: "🛑" },
@@ -187,7 +187,7 @@ const CONFIG_PROFESSOR = {
         {
             pergunta: "Q10. Quando não sabemos quantas crianças vão entrar, o robô deixa entrar até dizerem 'FIM':",
             iconePergunta: "🎟️",
-            respostaCorreta: "Repetir até dizer Fim", // POSIÇÃO: C
+            respostaCorreta: "Repetir até dizer Fim",
             dica: "Usamos o laço ENQUANTO até alguém falar a palavra mágica FIM!",
             opcoes: [
                 { letra: "A", texto: "Só deixa 1 criança entrar", icone: "1️⃣" },
@@ -309,7 +309,10 @@ function salvarCadastro(event) {
         if (telaCad) telaCad.classList.add('hidden');
     }
 }
-/* Lógica de Níveis e Progresso na Aba 1 */
+
+/* --------------------------------------------------------------------------
+   LÓGICA DE NÍVEIS E PROGRESSO NA ABA 1
+   -------------------------------------------------------------------------- */
 function filtrarNivel(nivel) {
     tocarSom('click');
     nivelFiltroAtual = nivel;
@@ -406,10 +409,41 @@ function atualizarBarraProgresso() {
     if (barra) barra.style.width = `${porc}%`;
 }
 
-/* Lógica do Quiz */
+/* --------------------------------------------------------------------------
+   FUNÇÕES DE NAVEGAÇÃO DO QUIZ E MODAL DE VITÓRIA
+   -------------------------------------------------------------------------- */
+function fecharModalVitoria() {
+    tocarSom('click');
+    const modal = document.getElementById('modal-vitoria');
+    if (modal) {
+        modal.classList.add('hidden');
+    }
+}
+
+function voltarPerguntaQuiz() {
+    tocarSom('click');
+    if (quizIndiceAtual > 0) {
+        quizIndiceAtual--;
+        renderizarPerguntaQuiz();
+    }
+}
+
+/* --------------------------------------------------------------------------
+   LÓGICA DO QUIZ DE LÓGICA
+   -------------------------------------------------------------------------- */
 function renderizarPerguntaQuiz() {
     const intro = CONFIG_PROFESSOR.quizIntroducao;
     const q = CONFIG_PROFESSOR.quiz[quizIndiceAtual];
+
+    // Exibe ou oculta o botão "Anterior"
+    const btnVoltar = document.getElementById('btn-voltar-questao');
+    if (btnVoltar) {
+        if (quizIndiceAtual > 0) {
+            btnVoltar.classList.remove('hidden');
+        } else {
+            btnVoltar.classList.add('hidden');
+        }
+    }
 
     const introBox = document.getElementById('quiz-introducao-box');
     if (introBox) {
